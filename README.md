@@ -77,6 +77,9 @@ Himoya continuously monitors web pages and flags posts containing multiple fraud
 - All processing happens locally in your browser
 - No user tracking or analytics
 
+![recording](https://github.com/user-attachments/assets/e4e0b312-9b9a-4f94-a35d-ea1e0c7465e7)
+
+
 ## Supported Platforms
 
 Himoya works on any website but is optimized for:
