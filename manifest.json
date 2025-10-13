@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Himoya",
+  "version": "2.7.3",
+  "description": "Flags suspicious Uzbek language posts using keyword patterns",
+  "permissions": ["activeTab"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["styles.css"]
+    }
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}

@@ -1,0 +1,52 @@
+.scam-warning {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+  color: white;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border-left: 5px solid #c92a2a;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  cursor: pointer;
+  transition: transform 0.2s;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  z-index: 10000;
+  position: relative;
+}
+
+.scam-warning:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.scam-warning-content {
+  display: flex;
+  align-items: start;
+  gap: 12px;
+}
+
+.scam-warning-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.scam-warning-text {
+  flex: 1;
+}
+
+.scam-warning-text strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 16px;
+}
+
+.scam-warning-text small {
+  opacity: 0.9;
+  font-size: 13px;
+}
+
+.blurred-content {
+  filter: blur(8px);
+  pointer-events: none;
+  user-select: none;
+  transition: filter 0.3s;
+}
