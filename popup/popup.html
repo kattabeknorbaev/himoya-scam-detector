@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Himoya</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <span class="logo">🛡️</span>
+        <div>
+          <h1 class="title">Himoya</h1>
+          <span class="version-tag">v3.0.0</span>
+        </div>
+      </div>
+      <label class="switch" title="Himoyani yoqish yoki o'chirish">
+        <input type="checkbox" id="masterToggle" checked>
+        <span class="slider"></span>
+      </label>
+    </header>
+
+    <!-- Main Status Card -->
+    <div class="status-card" id="statusCard">
+      <div class="status-indicator">
+        <span class="status-dot active" id="statusDot"></span>
+        <span class="status-text" id="statusText">Himoya faol ishlamoqda</span>
+      </div>
+      <div class="tab-threat-info">
+        <span class="threat-count-badge" id="threatCountBadge">0</span>
+        <span class="threat-label" id="threatLabel">ushbu sahifada shubhali xabarlar</span>
+      </div>
+    </div>
+
+    <!-- Current Site Whitelist Box -->
+    <div class="section-card site-card">
+      <div class="site-header">
+        <span class="site-icon">🌐</span>
+        <span class="site-domain" id="siteDomain">Yuklanmoqda...</span>
+      </div>
+      <button type="button" class="whitelist-btn" id="whitelistBtn">
+        Bu saytni ishonchli deb belgilash
+      </button>
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats-grid">
+      <div class="stat-box">
+        <span class="stat-number" id="statsToday">0</span>
+        <span class="stat-title">Bugun to'xtatildi</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-number" id="statsTotal">0</span>
+        <span class="stat-title">Jami to'xtatildi</span>
+      </div>
+    </div>
+
+    <!-- Sensitivity Settings -->
+    <div class="section-card">
+      <label class="section-label">Aniqlash sezgirligi:</label>
+      <div class="sensitivity-options">
+        <label class="radio-label">
+          <input type="radio" name="sensitivity" value="strict">
+          <span>Kuchli</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="sensitivity" value="balanced" checked>
+          <span>Standart</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="sensitivity" value="relaxed">
+          <span>Yengil</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <a href="https://github.com" target="_blank" class="footer-link" id="reportLink">
+        ⚠️ Yangi firibgarlikni xabar qilish
+      </a>
+      <span class="footer-copy">O'zbek xalqi xavfsizligi uchun</span>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
