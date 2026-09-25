@@ -1,7 +1,7 @@
 /**
- * Himoya Content Script v3.0.0
- * Monitors page DOM, identifies suspicious Uzbek content using engine.js,
- * safely blurs threats, and renders a sleek warning card.
+ * Himoya Content Script v3.5.0
+ * Monitors page DOM, identifies suspicious Uzbek content using engine.js & i18n.js,
+ * safely blurs threats, and renders localized warning cards.
  */
 
 (function () {
@@ -9,6 +9,8 @@
   let config = {
     enabled: true,
     sensitivity: 'balanced', // 'strict' (4.0), 'balanced' (5.0), 'relaxed' (7.0)
+    lang: 'uz',              // 'uz' | 'uz_cyr' | 'ru'
+    audioAlert: false,
     whitelistedDomains: []
   };
 
@@ -22,18 +24,54 @@
   const scannedElements = new WeakSet();
   let flaggedCount = 0;
   let isScanningQueued = false;
+  let hasChimedThisPage = false;
   const scanQueue = [];
+
+  // Helper for localized text
+  function t() {
+    if (typeof HIMOYA_I18N !== 'undefined' && HIMOYA_I18N[config.lang]) {
+      return HIMOYA_I18N[config.lang];
+    }
+    return HIMOYA_I18N ? HIMOYA_I18N.uz : {};
+  }
+
+  // Gentle audio chime synthesized via Web Audio API (no external asset needed)
+  function playWarningChime() {
+    if (!config.audioAlert || hasChimedThisPage) return;
+    hasChimedThisPage = true;
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+      osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.25); // A4
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.3);
+    } catch (err) {}
+  }
 
   // Initialize extension settings from storage
   function loadSettings(callback) {
     if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
-      chrome.storage.local.get(['himoya_enabled', 'himoya_sensitivity', 'himoya_whitelist'], (res) => {
-        if (res.himoya_enabled !== undefined) config.enabled = res.himoya_enabled;
-        if (res.himoya_sensitivity) config.sensitivity = res.himoya_sensitivity;
-        if (Array.isArray(res.himoya_whitelist)) config.whitelistedDomains = res.himoya_whitelist;
+      chrome.storage.local.get(
+        ['himoya_enabled', 'himoya_sensitivity', 'himoya_whitelist', 'himoya_lang', 'himoya_audio'], 
+        (res) => {
+          if (res.himoya_enabled !== undefined) config.enabled = res.himoya_enabled;
+          if (res.himoya_sensitivity) config.sensitivity = res.himoya_sensitivity;
+          if (res.himoya_lang) config.lang = res.himoya_lang;
+          if (res.himoya_audio !== undefined) config.audioAlert = res.himoya_audio;
+          if (Array.isArray(res.himoya_whitelist)) config.whitelistedDomains = res.himoya_whitelist;
 
-        if (callback) callback();
-      });
+          if (callback) callback();
+        }
+      );
     } else {
       if (callback) callback();
     }
@@ -55,9 +93,7 @@
           count: flaggedCount,
           host: currentHost
         });
-      } catch (err) {
-        // Context might be invalidated on extension reload
-      }
+      } catch (err) {}
     }
   }
 
@@ -71,8 +107,9 @@
     scannedElements.add(element);
     flaggedCount++;
     notifyBackgroundThreat();
+    playWarningChime();
 
-    // Prepare container
+    const strings = t();
     const isTableCell = element.tagName === 'TD' || element.tagName === 'TH';
     
     // Create card overlay
@@ -80,32 +117,33 @@
     card.className = 'himoya-warning-card';
 
     const riskBadgeClass = result.riskLevel === 'HIGH' ? 'high' : 'medium';
-    const riskBadgeText = result.riskLevel === 'HIGH' ? '🚨 Yuqori xavf' : '⚠️ Shubhali xabar';
+    const riskBadgeText = result.riskLevel === 'HIGH' ? (strings.riskHigh || '🚨 Yuqori xavf') : (strings.riskMedium || '⚠️ Shubhali xabar');
 
     const tagsHtml = result.categories.map(c => 
-      `<span class="himoya-tag">${escapeHtml(c.nameUz)}</span>`
+      `<span class="himoya-tag">${escapeHtml(c.name)}</span>`
     ).join('');
+
+    const descText = (strings.cardDesc || "Ushbu xabarda firibgarlik alomatlari topildi (Ball: {score})")
+      .replace('{score}', result.score);
 
     card.innerHTML = `
       <div class="himoya-header-row">
         <div class="himoya-header-left">
           <span class="himoya-shield-icon">🛡️</span>
-          <h4 class="himoya-title">Himoya: Shubhali post aniqlandi</h4>
+          <h4 class="himoya-title">${escapeHtml(strings.cardTitle || 'Himoya: Shubhali post aniqlandi')}</h4>
         </div>
         <span class="himoya-risk-badge ${riskBadgeClass}">${riskBadgeText}</span>
       </div>
-      <p class="himoya-body-desc">
-        Ushbu xabarda firibgarlik yoki shaxsiy ma'lumotlarni o'g'irlash alomatlari topildi (Ball: ${result.score}).
-      </p>
+      <p class="himoya-body-desc">${escapeHtml(descText)}</p>
       <div class="himoya-tags-list">
         ${tagsHtml}
       </div>
       <div class="himoya-actions-row">
         <button type="button" class="himoya-btn himoya-btn-primary himoya-reveal-btn">
-          👁️ Ko'rish
+          ${escapeHtml(strings.cardReveal || "👁️ Ko'rish")}
         </button>
         <button type="button" class="himoya-btn himoya-btn-secondary himoya-dismiss-btn">
-          ✓ Xatolik (Xavfsiz)
+          ${escapeHtml(strings.cardDismiss || "✓ Xatolik (Xavfsiz)")}
         </button>
       </div>
     `;
@@ -113,7 +151,7 @@
     // Apply blur to target
     element.classList.add('himoya-blurred-content');
 
-    // Create wrapper or safe insertion
+    // Safe insertion
     if (isTableCell) {
       element.prepend(card);
     } else {
@@ -139,9 +177,10 @@
       // Insert subtle ribbon with re-blur option
       const ribbon = document.createElement('div');
       ribbon.className = 'himoya-revealed-ribbon';
+      const catName = result.categories[0]?.name || 'Shubhali';
       ribbon.innerHTML = `
-        <span>🛡️ Himoya: Ogohlantirish ochildi (${escapeHtml(result.categories[0]?.nameUz || 'Shubhali')})</span>
-        <button type="button" class="himoya-reblur-btn">Qayta yashirish</button>
+        <span>${escapeHtml(strings.ribbonTitle || '🛡️ Himoya: Ogohlantirish ochildi')} (${escapeHtml(catName)})</span>
+        <button type="button" class="himoya-reblur-btn">${escapeHtml(strings.ribbonReblur || 'Qayta yashirish')}</button>
       `;
 
       ribbon.querySelector('.himoya-reblur-btn').addEventListener('click', (ev) => {
@@ -193,9 +232,8 @@
     }
 
     const threshold = THRESHOLD_MAP[config.sensitivity] || 5.0;
-    // analyzeContent is exposed by engine.js
     if (typeof analyzeContent === 'function') {
-      const result = analyzeContent(text, threshold);
+      const result = analyzeContent(text, threshold, config.lang);
       if (result.isScam) {
         applyScamWarning(el, result);
       } else {
@@ -213,7 +251,7 @@
     }
 
     const startTime = Date.now();
-    const CHUNK_BUDGET_MS = 12; // Run max 12ms per frame to ensure 60fps
+    const CHUNK_BUDGET_MS = 12;
 
     while (scanQueue.length > 0 && (Date.now() - startTime < CHUNK_BUDGET_MS)) {
       const el = scanQueue.shift();
@@ -256,7 +294,6 @@
     if (!config.enabled || isSiteWhitelisted()) return;
 
     const selectors = [
-      // Social media feed posts
       'article',
       'div[role="article"]',
       '[data-testid="post"]',
@@ -266,7 +303,6 @@
       '.message-content',
       'div.post',
       'div.comment',
-      // General fallbacks
       'blockquote',
       'div.message',
       'p'
@@ -297,7 +333,6 @@
       if (msg.type === 'HIMOYA_SETTINGS_CHANGED') {
         loadSettings(() => {
           if (!config.enabled || isSiteWhitelisted()) {
-            // Remove blur and cards if disabled
             document.querySelectorAll('.himoya-blurred-content').forEach(el => {
               el.classList.remove('himoya-blurred-content');
             });
@@ -337,5 +372,5 @@
     }
   });
 
-  console.log('Himoya v3.0.0: Initialized successfully with Uzbek Latin & Cyrillic engine.');
+  console.log('Himoya v3.5.0: Initialized successfully with trilingual support.');
 })();

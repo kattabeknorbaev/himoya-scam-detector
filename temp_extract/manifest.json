@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Himoya: Uzbek Scam & Phishing Detector",
-  "version": "3.0.0",
+  "version": "3.5.0",
   "description": "Protects Uzbek speakers from financial fraud, fake giveaways, and phishing in real time using smart pattern analysis.",
   "permissions": [
     "storage"
@@ -24,6 +24,7 @@
         "<all_urls>"
       ],
       "js": [
+        "i18n.js",
         "engine.js",
         "content.js"
       ],
