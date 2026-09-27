@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Himoya: Uzbek Scam & Phishing Detector",
-  "version": "4.0.0",
-  "description": "Protects Uzbek speakers from financial fraud, fake giveaways, and phishing in real time using smart pattern analysis.",
+  "name": "Himoya: AI Scam & Phishing Detector",
+  "version": "4.5.0",
+  "description": "Protects Uzbek speakers from financial fraud, fake giveaways, and phishing in real time using local ML and behavioral analysis.",
   "permissions": [
     "storage"
   ],
@@ -11,7 +11,7 @@
   },
   "action": {
     "default_popup": "popup/popup.html",
-    "default_title": "Himoya PRO",
+    "default_title": "Himoya AI",
     "default_icon": {
       "16": "icon16.png",
       "48": "icon48.png",
@@ -25,6 +25,9 @@
       ],
       "js": [
         "i18n.js",
+        "ml_classifier.js",
+        "heuristics.js",
+        "ai_provider.js",
         "engine.js",
         "content.js"
       ],

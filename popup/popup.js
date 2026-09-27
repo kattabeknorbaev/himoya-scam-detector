@@ -1,10 +1,10 @@
 /**
- * Himoya Popup Controller v4.0.0
- * Modern UI interactions, segmented controls, quick sample chips, and instant scam diagnosis.
+ * Himoya Popup Controller v4.5.0
+ * Robust UI interactions, multi-layer ML diagnostics, tab switching, and error-safe DOM handlers.
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Brand & Controls
+  // Elements
   const masterToggle = document.getElementById('masterToggle');
   const statusDot = document.getElementById('statusDot');
   const statusText = document.getElementById('statusText');
@@ -55,12 +55,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   let activeTabId = null;
   let currentLang = 'uz';
 
-  // Apply Language Strings
+  // Apply Language Strings with Null Safety
   function applyLanguage(lang) {
     currentLang = lang;
-    const str = (typeof HIMOYA_I18N !== 'undefined' && HIMOYA_I18N[lang]) ? HIMOYA_I18N[lang] : HIMOYA_I18N.uz;
+    const str = (typeof HIMOYA_I18N !== 'undefined' && HIMOYA_I18N[lang]) ? HIMOYA_I18N[lang] : (HIMOYA_I18N ? HIMOYA_I18N.uz : {});
 
-    // Update active pill
+    // Update active pill styling
     langPills.forEach(pill => {
       pill.classList.toggle('active', pill.dataset.lang === lang);
     });
@@ -71,30 +71,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (navRules) navRules.textContent = `📖 ${str.rulesTab || 'Qoidalar'}`;
 
     // Status & Labels
-    updateStatusDisplay(masterToggle.checked);
-    statsTodayLabel.textContent = str.statsToday;
-    statsTotalLabel.textContent = str.statsTotal;
-    sensitivityLabel.textContent = str.sensitivityLabel;
-    optStrict.textContent = str.sensitivityStrict;
-    optBalanced.textContent = str.sensitivityBalanced;
-    optRelaxed.textContent = str.sensitivityRelaxed;
-    audioLabel.textContent = `🔔 ${str.audioAlertLabel}`;
-    reportLink.textContent = str.reportLink;
-    footerCopy.textContent = str.tagline;
+    if (masterToggle) updateStatusDisplay(masterToggle.checked);
+    if (statsTodayLabel && str.statsToday) statsTodayLabel.textContent = str.statsToday;
+    if (statsTotalLabel && str.statsTotal) statsTotalLabel.textContent = str.statsTotal;
+    if (sensitivityLabel && str.sensitivityLabel) sensitivityLabel.textContent = str.sensitivityLabel;
+    if (optStrict && str.sensitivityStrict) optStrict.textContent = str.sensitivityStrict;
+    if (optBalanced && str.sensitivityBalanced) optBalanced.textContent = str.sensitivityBalanced;
+    if (optRelaxed && str.sensitivityRelaxed) optRelaxed.textContent = str.sensitivityRelaxed;
+    if (audioLabel && str.audioAlertLabel) audioLabel.textContent = `🔔 ${str.audioAlertLabel}`;
+    if (reportLink && str.reportLink) reportLink.textContent = str.reportLink;
+    if (footerCopy && str.tagline) footerCopy.textContent = str.tagline;
 
     // Scanner
     if (checkerTitle) checkerTitle.textContent = str.checkerTab || 'Matnni tekshirish';
-    if (checkerHint) checkerHint.textContent = (str.checkerPlaceholder || '').replace('...', '');
-    if (checkerInput) checkerInput.placeholder = str.checkerPlaceholder;
+    if (checkerHint && str.checkerPlaceholder) checkerHint.textContent = str.checkerPlaceholder.replace('...', '');
+    if (checkerInput && str.checkerPlaceholder) checkerInput.placeholder = str.checkerPlaceholder;
     if (checkBtnText) checkBtnText.textContent = str.checkerBtn ? str.checkerBtn.replace('🔍 ', '') : 'Xabarni tekshirish';
 
     // Rules
-    rulesList.innerHTML = str.rules.map(r => `
-      <div class="rule-card">
-        <div class="rule-heading">${escapeHtml(r.title)}</div>
-        <div class="rule-body">${escapeHtml(r.desc)}</div>
-      </div>
-    `).join('');
+    if (rulesList && str.rules) {
+      rulesList.innerHTML = str.rules.map((r, idx) => `
+        <div class="rule-card">
+          <div class="rule-heading"><span class="rule-badge">${idx + 1}</span> ${escapeHtml(r.title)}</div>
+          <div class="rule-body">${escapeHtml(r.desc)}</div>
+        </div>
+      `).join('');
+    }
   }
 
   function escapeHtml(str) {
@@ -102,81 +104,90 @@ document.addEventListener('DOMContentLoaded', async () => {
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
-  // 1. Get current active tab
+  // 1. Get current active tab safely
   try {
-    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-    if (tabs && tabs.length > 0 && tabs[0].url) {
-      activeTabId = tabs[0].id;
-      const url = new URL(tabs[0].url);
-      if (url.protocol.startsWith('http')) {
-        currentDomain = url.hostname.toLowerCase();
-        siteDomainEl.textContent = currentDomain;
-      } else {
-        siteDomainEl.textContent = 'Brauzer sahifasi';
-        whitelistBtn.style.display = 'none';
+    if (typeof chrome !== 'undefined' && chrome.tabs && chrome.tabs.query) {
+      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (tabs && tabs.length > 0 && tabs[0].url) {
+        activeTabId = tabs[0].id;
+        const url = new URL(tabs[0].url);
+        if (url.protocol.startsWith('http')) {
+          currentDomain = url.hostname.toLowerCase();
+          if (siteDomainEl) siteDomainEl.textContent = currentDomain;
+        } else {
+          if (siteDomainEl) siteDomainEl.textContent = 'Brauzer sahifasi';
+          if (whitelistBtn) whitelistBtn.style.display = 'none';
+        }
       }
-    } else {
-      siteDomainEl.textContent = 'Sahifa aniqlanmadi';
-      whitelistBtn.style.display = 'none';
     }
   } catch (err) {
-    siteDomainEl.textContent = 'Mavjud emas';
-    whitelistBtn.style.display = 'none';
+    if (siteDomainEl) siteDomainEl.textContent = 'Mavjud emas';
+    if (whitelistBtn) whitelistBtn.style.display = 'none';
   }
 
   // 2. Load stored settings and stats
-  chrome.storage.local.get(
-    ['himoya_enabled', 'himoya_sensitivity', 'himoya_whitelist', 'himoya_stats_today', 'himoya_stats_total', 'himoya_lang', 'himoya_audio'],
-    (data) => {
-      const enabled = data.himoya_enabled !== undefined ? data.himoya_enabled : true;
-      const sensitivity = data.himoya_sensitivity || 'balanced';
-      const whitelist = Array.isArray(data.himoya_whitelist) ? data.himoya_whitelist : [];
-      const statsToday = data.himoya_stats_today || 0;
-      const statsTotal = data.himoya_stats_total || 0;
-      const lang = data.himoya_lang || 'uz';
-      const audio = data.himoya_audio !== undefined ? data.himoya_audio : false;
+  if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+    chrome.storage.local.get(
+      ['himoya_enabled', 'himoya_sensitivity', 'himoya_whitelist', 'himoya_stats_today', 'himoya_stats_total', 'himoya_lang', 'himoya_audio'],
+      (data) => {
+        const enabled = data.himoya_enabled !== undefined ? data.himoya_enabled : true;
+        const sensitivity = data.himoya_sensitivity || 'balanced';
+        const whitelist = Array.isArray(data.himoya_whitelist) ? data.himoya_whitelist : [];
+        const statsToday = data.himoya_stats_today || 0;
+        const statsTotal = data.himoya_stats_total || 0;
+        const lang = data.himoya_lang || 'uz';
+        const audio = data.himoya_audio !== undefined ? data.himoya_audio : false;
 
-      // Apply language
-      applyLanguage(lang);
+        // Apply language
+        applyLanguage(lang);
 
-      // Audio
-      audioToggle.checked = audio;
+        // Audio
+        if (audioToggle) audioToggle.checked = audio;
 
-      // Master toggle
-      masterToggle.checked = enabled;
-      updateStatusDisplay(enabled);
+        // Master toggle
+        if (masterToggle) {
+          masterToggle.checked = enabled;
+          updateStatusDisplay(enabled);
+        }
 
-      // Stats
-      statsTodayEl.textContent = statsToday;
-      statsTotalEl.textContent = statsTotal;
+        // Stats
+        if (statsTodayEl) statsTodayEl.textContent = statsToday;
+        if (statsTotalEl) statsTotalEl.textContent = statsTotal;
 
-      // Sensitivity radio
-      const matchedRadio = document.querySelector(`input[name="sensitivity"][value="${sensitivity}"]`);
-      if (matchedRadio) matchedRadio.checked = true;
+        // Sensitivity radio
+        const matchedRadio = document.querySelector(`input[name="sensitivity"][value="${sensitivity}"]`);
+        if (matchedRadio) matchedRadio.checked = true;
 
-      // Whitelist button
-      updateWhitelistButtonState(whitelist.includes(currentDomain));
-    }
-  );
+        // Whitelist button
+        updateWhitelistButtonState(whitelist.includes(currentDomain));
+      }
+    );
+  } else {
+    applyLanguage('uz');
+  }
 
   // 3. Query active tab for page threat count
-  if (activeTabId) {
+  if (activeTabId && typeof chrome !== 'undefined' && chrome.tabs && chrome.tabs.sendMessage) {
     chrome.tabs.sendMessage(activeTabId, { type: 'HIMOYA_GET_PAGE_STATUS' }, (res) => {
       if (chrome.runtime.lastError || !res) {
-        threatCountBadge.textContent = '0';
-        threatCountBadge.classList.remove('has-threats');
-        threatSub.textContent = 'Sahifada xavf aniqlanmadi';
+        if (threatCountBadge) {
+          threatCountBadge.textContent = '0';
+          threatCountBadge.classList.remove('has-threats');
+        }
+        if (threatSub) threatSub.textContent = 'Sahifada xavf aniqlanmadi';
         return;
       }
 
       const count = res.count || 0;
-      threatCountBadge.textContent = count.toString();
-      if (count > 0) {
-        threatCountBadge.classList.add('has-threats');
-        threatSub.textContent = `${count} ta xavf bartaraf etildi`;
-      } else {
-        threatCountBadge.classList.remove('has-threats');
-        threatSub.textContent = 'Sahifada xavf aniqlanmadi';
+      if (threatCountBadge) {
+        threatCountBadge.textContent = count.toString();
+        if (count > 0) {
+          threatCountBadge.classList.add('has-threats');
+          if (threatSub) threatSub.textContent = `${count} ta xavf bartaraf etildi`;
+        } else {
+          threatCountBadge.classList.remove('has-threats');
+          if (threatSub) threatSub.textContent = 'Sahifada xavf aniqlanmadi';
+        }
       }
     });
   }
@@ -184,17 +195,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Update Status Display
   function updateStatusDisplay(isEnabled) {
     const str = (typeof HIMOYA_I18N !== 'undefined' && HIMOYA_I18N[currentLang]) ? HIMOYA_I18N[currentLang] : {};
-    if (isEnabled) {
-      statusDot.className = 'beacon-pulse';
-      statusText.textContent = str.statusActive || 'Himoya faol ishlamoqda';
-    } else {
-      statusDot.className = 'beacon-pulse disabled';
-      statusText.textContent = str.statusDisabled || 'Himoya to\'xtatilgan';
+    if (statusDot) {
+      if (isEnabled) {
+        statusDot.className = 'beacon-pulse';
+        if (statusText) statusText.textContent = str.statusActive || 'Himoya faol ishlamoqda';
+      } else {
+        statusDot.className = 'beacon-pulse disabled';
+        if (statusText) statusText.textContent = str.statusDisabled || 'Himoya to\'xtatilgan';
+      }
     }
   }
 
   // Update Whitelist Button UI
   function updateWhitelistButtonState(isWhitelisted) {
+    if (!whitelistBtn) return;
     if (isWhitelisted) {
       whitelistBtn.textContent = 'O\'chirilgan';
       whitelistBtn.classList.add('whitelisted');
@@ -206,7 +220,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Event: Tabs Switching
   navBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
       navBtns.forEach(b => b.classList.remove('active'));
       tabPanes.forEach(c => c.classList.remove('active'));
 
@@ -218,77 +233,104 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Event: Language Switch Pills
   langPills.forEach(pill => {
-    pill.addEventListener('click', () => {
+    pill.addEventListener('click', (e) => {
+      e.preventDefault();
       const lang = pill.dataset.lang;
-      chrome.storage.local.set({ himoya_lang: lang }, () => {
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.set({ himoya_lang: lang }, () => {
+          applyLanguage(lang);
+          notifyTabSettingsChanged();
+        });
+      } else {
         applyLanguage(lang);
-        notifyTabSettingsChanged();
-      });
+      }
     });
   });
 
   // Event: Master Toggle Switch
-  masterToggle.addEventListener('change', () => {
-    const isEnabled = masterToggle.checked;
-    updateStatusDisplay(isEnabled);
+  if (masterToggle) {
+    masterToggle.addEventListener('change', () => {
+      const isEnabled = masterToggle.checked;
+      updateStatusDisplay(isEnabled);
 
-    chrome.storage.local.set({ himoya_enabled: isEnabled }, () => {
-      notifyTabSettingsChanged();
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.set({ himoya_enabled: isEnabled }, () => {
+          notifyTabSettingsChanged();
+        });
+      }
     });
-  });
+  }
 
   // Event: Audio Toggle
-  audioToggle.addEventListener('change', () => {
-    chrome.storage.local.set({ himoya_audio: audioToggle.checked }, () => {
-      notifyTabSettingsChanged();
+  if (audioToggle) {
+    audioToggle.addEventListener('change', () => {
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.set({ himoya_audio: audioToggle.checked }, () => {
+          notifyTabSettingsChanged();
+        });
+      }
     });
-  });
+  }
 
   // Event: Sensitivity Change
   document.querySelectorAll('input[name="sensitivity"]').forEach(input => {
     input.addEventListener('change', () => {
-      chrome.storage.local.set({ himoya_sensitivity: input.value }, () => {
-        notifyTabSettingsChanged();
-      });
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.set({ himoya_sensitivity: input.value }, () => {
+          notifyTabSettingsChanged();
+        });
+      }
     });
   });
 
   // Event: Whitelist Button Click
-  whitelistBtn.addEventListener('click', () => {
-    if (!currentDomain) return;
+  if (whitelistBtn) {
+    whitelistBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (!currentDomain) return;
 
-    chrome.storage.local.get(['himoya_whitelist'], (res) => {
-      let list = Array.isArray(res.himoya_whitelist) ? [...res.himoya_whitelist] : [];
-      const index = list.indexOf(currentDomain);
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.get(['himoya_whitelist'], (res) => {
+          let list = Array.isArray(res.himoya_whitelist) ? [...res.himoya_whitelist] : [];
+          const index = list.indexOf(currentDomain);
 
-      if (index === -1) {
-        list.push(currentDomain);
-        updateWhitelistButtonState(true);
-      } else {
-        list.splice(index, 1);
-        updateWhitelistButtonState(false);
+          if (index === -1) {
+            list.push(currentDomain);
+            updateWhitelistButtonState(true);
+          } else {
+            list.splice(index, 1);
+            updateWhitelistButtonState(false);
+          }
+
+          chrome.storage.local.set({ himoya_whitelist: list }, () => {
+            notifyTabSettingsChanged();
+          });
+        });
       }
-
-      chrome.storage.local.set({ himoya_whitelist: list }, () => {
-        notifyTabSettingsChanged();
-      });
     });
-  });
+  }
 
   // Quick Sample Chips Click
   chipBtns.forEach(chip => {
-    chip.addEventListener('click', () => {
-      checkerInput.value = chip.dataset.sample;
-      runAnalysis();
+    chip.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (checkerInput) {
+        checkerInput.value = chip.dataset.sample;
+        runAnalysis();
+      }
     });
   });
 
   // Scanner Button Click
-  checkMsgBtn.addEventListener('click', () => {
-    runAnalysis();
-  });
+  if (checkMsgBtn) {
+    checkMsgBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      runAnalysis();
+    });
+  }
 
   function runAnalysis() {
+    if (!checkerInput || !resultBox || !checkerResult) return;
     const text = (checkerInput.value || '').trim();
     if (!text) return;
 
@@ -300,24 +342,54 @@ document.addEventListener('DOMContentLoaded', async () => {
         resultBox.className = 'result-card scam';
         const tagsHtml = res.categories.map(c => `<span class="res-tag">${escapeHtml(c.name)}</span>`).join('');
         const matchedKw = res.matchedKeywords.length > 0 
-          ? `<div class="res-advice"><strong>Kalit belgilar:</strong> ${res.matchedKeywords.map(k => `<code>${escapeHtml(k)}</code>`).join(', ')}</div>`
+          ? `<div class="res-advice" style="margin-top:6px;"><strong>Aniqlangan belgilar:</strong> ${res.matchedKeywords.map(k => `<code>${escapeHtml(k)}</code>`).join(' ')}</div>`
           : '';
+
+        const mlBadge = res.mlProbability 
+          ? `
+            <div class="ml-meter-box">
+              <div class="ml-meter-label">
+                <span>🧠 AI / ML Modeli:</span>
+                <strong>${res.mlProbability}% Firibgarlik ehtimoli</strong>
+              </div>
+              <div class="ml-meter-bar">
+                <div class="ml-meter-fill" style="width: ${res.mlProbability}%"></div>
+              </div>
+            </div>
+          `
+          : '';
+
+        let heuristicNotes = '';
+        if (res.heuristics) {
+          const notes = [];
+          if (res.heuristics.baitProximity) notes.push('🎣 Yutuq va harakat bevosita bog\'langan (Bait-to-Action)');
+          if (res.heuristics.urgencyIndex >= 0.4) notes.push('⏱️ Sun\'iy psixologik shoshiltirish');
+          if (res.heuristics.urlRisk) notes.push('🔗 Shubhali yoki yashirin havola formati');
+          if (notes.length > 0) {
+            heuristicNotes = `<div class="heuristic-box"><strong>Xulq-atvor tahlili:</strong><br>${notes.map(n => `• ${escapeHtml(n)}`).join('<br>')}</div>`;
+          }
+        }
 
         resultBox.innerHTML = `
           <div class="res-header-row">
             <span class="res-title">🚨 XAVF: FIRIBGARLIK ANIQLANDI</span>
             <span class="res-badge high">${res.riskLevel}</span>
           </div>
+          ${mlBadge}
           <div class="res-tags">
             ${tagsHtml}
           </div>
           ${matchedKw}
-          <div class="res-advice" style="color: #9f1239; font-weight: 600; margin-top: 6px;">
+          ${heuristicNotes}
+          <div class="res-advice-warning">
             ⚠️ Hech qachon bu havolani ochmang va shaxsiy ma'lumotlaringizni kiritmang!
           </div>
         `;
       } else {
         resultBox.className = 'result-card safe';
+        const mlNote = res.mlProbability 
+          ? `<div style="font-size:11px;color:#166534;margin-top:4px;">🧠 AI/ML Modeli: ${res.mlProbability}% ehtimol (Xavfsiz)</div>`
+          : '';
         resultBox.innerHTML = `
           <div class="res-header-row">
             <span class="res-title" style="color: #166534;">🛡️ SHUBHALI BELGILAR TOPILMADI</span>
@@ -326,54 +398,70 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="res-advice" style="color: #166534;">
             Xabarda moliyaviy firibgarlik yoki fishing alomatlari aniqlanmadi.
           </div>
+          ${mlNote}
         `;
       }
     }
   }
 
   // Event: Simulator Demo Button
-  demoBtn.addEventListener('click', () => {
-    demoContainer.style.display = 'block';
-    if (typeof analyzeContent === 'function') {
-      const sampleText = demoPost.innerText;
-      const res = analyzeContent(sampleText, 4.0, currentLang);
+  if (demoBtn && demoContainer && demoPost) {
+    demoBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      demoContainer.style.display = 'block';
 
-      // Create simulator overlay
-      demoPost.style.filter = 'blur(6px)';
-      demoPost.style.opacity = '0.4';
-      
-      const str = (typeof HIMOYA_I18N !== 'undefined' && HIMOYA_I18N[currentLang]) ? HIMOYA_I18N[currentLang] : {};
-      const card = document.createElement('div');
-      card.style.cssText = 'background:#fff;border:1.5px solid #e11d48;border-radius:10px;padding:10px;margin-bottom:8px;font-size:11px;';
-      card.innerHTML = `
-        <div style="font-weight:700;color:#e11d48;margin-bottom:4px;">🛡️ ${str.cardTitle || 'Himoya: Shubhali post aniqlandi'}</div>
-        <div style="font-size:10.5px;color:#475569;margin-bottom:6px;">${res.categories.map(c => c.name).join(', ')}</div>
-        <button type="button" style="background:#e11d48;color:#fff;border:none;padding:5px 12px;border-radius:6px;font-weight:600;cursor:pointer;">${str.cardReveal || "Ko'rish"}</button>
-      `;
+      // Clear any prior card
+      const oldCard = demoContainer.querySelector('.demo-warning-overlay');
+      if (oldCard) oldCard.remove();
 
-      card.querySelector('button').addEventListener('click', () => {
-        demoPost.style.filter = 'none';
-        demoPost.style.opacity = '1';
-        card.remove();
-      });
+      if (typeof analyzeContent === 'function') {
+        const sampleText = demoPost.innerText;
+        const res = analyzeContent(sampleText, 4.0, currentLang);
 
-      demoContainer.prepend(card);
-    }
-  });
+        demoPost.style.filter = 'blur(6px)';
+        demoPost.style.opacity = '0.35';
+        demoPost.style.pointerEvents = 'none';
+        
+        const str = (typeof HIMOYA_I18N !== 'undefined' && HIMOYA_I18N[currentLang]) ? HIMOYA_I18N[currentLang] : {};
+        const card = document.createElement('div');
+        card.className = 'demo-warning-overlay';
+        card.style.cssText = 'background:#ffffff;border:1.5px solid #e11d48;border-radius:12px;padding:12px;margin-bottom:8px;box-shadow:0 4px 12px rgba(225,29,72,0.15);';
+        card.innerHTML = `
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <strong style="font-size:12px;color:#0f172a;">🛡️ ${str.cardTitle || 'Himoya: Shubhali post aniqlandi'}</strong>
+            <span style="font-size:10px;font-weight:800;background:#ffe4e6;color:#e11d48;padding:2px 6px;border-radius:4px;">YUQORI XAVF</span>
+          </div>
+          <div style="font-size:11px;color:#475569;margin-bottom:8px;">${res.categories.map(c => c.name).join(', ')}</div>
+          <button type="button" style="background:linear-gradient(135deg,#e11d48,#be123c);color:#fff;border:none;padding:5px 14px;border-radius:6px;font-size:11.5px;font-weight:700;cursor:pointer;">${str.cardReveal || "👁️ Ko'rish"}</button>
+        `;
+
+        card.querySelector('button').addEventListener('click', () => {
+          demoPost.style.filter = 'none';
+          demoPost.style.opacity = '1';
+          demoPost.style.pointerEvents = 'auto';
+          card.remove();
+        });
+
+        demoContainer.prepend(card);
+      }
+    });
+  }
 
   // Helper: notify active tab content script
   function notifyTabSettingsChanged() {
-    if (activeTabId) {
+    if (activeTabId && typeof chrome !== 'undefined' && chrome.tabs && chrome.tabs.sendMessage) {
       chrome.tabs.sendMessage(activeTabId, { type: 'HIMOYA_SETTINGS_CHANGED' }, (response) => {
         if (!chrome.runtime.lastError && response) {
           const count = response.count || 0;
-          threatCountBadge.textContent = count.toString();
-          if (count > 0) {
-            threatCountBadge.classList.add('has-threats');
-            threatSub.textContent = `${count} ta xavf bartaraf etildi`;
-          } else {
-            threatCountBadge.classList.remove('has-threats');
-            threatSub.textContent = 'Sahifada xavf aniqlanmadi';
+          if (threatCountBadge) {
+            threatCountBadge.textContent = count.toString();
+            if (count > 0) {
+              threatCountBadge.classList.add('has-threats');
+              if (threatSub) threatSub.textContent = `${count} ta xavf bartaraf etildi`;
+            } else {
+              threatCountBadge.classList.remove('has-threats');
+              if (threatSub) threatSub.textContent = 'Sahifada xavf aniqlanmadi';
+            }
           }
         }
       });

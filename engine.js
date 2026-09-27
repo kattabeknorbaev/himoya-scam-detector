@@ -1,56 +1,68 @@
 /**
- * Himoya Advanced Detection Engine v4.0.0
- * Multi-layer hybrid detection engine:
- * 1. Semantic Feature Extraction (Money amounts, prize bait, link CTAs, card/SMS credentials, doubling multipliers)
- * 2. High-Confidence Combinatorial Fast-Paths (Flags instant scams like "5 mln yutdingiz + linkga bosing" with 100% precision)
- * 3. Suffix-Tolerant Uzbek & Cyrillic Lemmatization & Pattern Matching
- * 4. Multi-Category Weighted Risk Evaluation
+ * Himoya Unified Intelligence Engine v4.5.0
+ * Multi-layer Hybrid Cybersecurity Architecture:
+ * - Layer 1: Homoglyph & Obfuscation De-anonymizer
+ * - Layer 2: Machine Learning Probabilistic Text Classifier (Naive Bayes Log-Odds)
+ * - Layer 3: Social Engineering & Behavioral Heuristics (Bait-to-CTA Proximity, Urgency, URL Risk)
+ * - Layer 4: Semantic Intent & Fast-Path Combinatorial Rules
+ * - Layer 5: Optional Local On-Device Chrome AI (Gemini Nano)
  */
+
+// Import dependencies if in Node.js
+let ML_ENGINE = null;
+let HEURISTICS_ENGINE = null;
+let AI_ENGINE = null;
+
+if (typeof require !== 'undefined') {
+  try { ML_ENGINE = require('./ml_classifier.js'); } catch (e) {}
+  try { HEURISTICS_ENGINE = require('./heuristics.js'); } catch (e) {}
+  try { AI_ENGINE = require('./ai_provider.js'); } catch (e) {}
+}
+
+function getML() {
+  if (ML_ENGINE) return ML_ENGINE;
+  if (typeof HimoyaML !== 'undefined') return HimoyaML;
+  return null;
+}
+
+function getHeuristics() {
+  if (HEURISTICS_ENGINE) return HEURISTICS_ENGINE;
+  if (typeof HimoyaHeuristics !== 'undefined') return HimoyaHeuristics;
+  return null;
+}
+
+function getAI() {
+  if (AI_ENGINE) return AI_ENGINE;
+  if (typeof HimoyaAI !== 'undefined') return HimoyaAI;
+  return null;
+}
 
 // Normalized text helper: converts all Uzbek apostrophe variants to standard '
 function normalizeUzbekText(text) {
   if (!text) return '';
   return text
-    // Replace all quotation/apostrophe variants: ’ ‘ ʻ ` ´ ʹ with standard '
     .replace(/[\u2018\u2019\u02BB\u0060\u00B4\u02BC\u201B\u02B9]/g, "'")
-    // Replace non-breaking spaces, zero-width characters, and tabs with normal space
     .replace(/[\u200B-\u200D\uFEFF]/g, '')
     .replace(/\s+/g, ' ')
     .trim();
 }
 
 /**
- * SEMANTIC FEATURE EXTRACTORS (RegEx NER)
- * Extracts intent signals across Latin, Cyrillic, and regional slang.
+ * SEMANTIC INTENT PATTERNS (NER)
  */
 const SEMANTIC_FEATURES = {
-  // Money amounts: e.g. "5 mln", "1000$", "500 000 so'm", "100 ming"
   MONEY_AMOUNT: /\b\d+[\s.]*(?:000)?\s*(?:mln|million|миллион|млн|mlrd|milliard|миллиард|ming|минг|k|usd|dollar|доллар|\$|so['ʻ’`]?m|som|сўм|сум|евро|euro|rubl|рубль|usdt)\b/i,
-
-  // Lottery, prize, winner bait
   WIN_PRIZE: /\b(?:yut(?:ib|uq|dingiz|ding|di|dik|dim|gan|ing|adi|ish)?|sovg['ʻ’`]?a\w*|sovrin\w*|g['ʻ’`]?olib\w*|mukofot\w*|sovga\w*|совға\w*|ютуқ\w*|ютдингиз|ютиб|ғолиб\w*|мукофот\w*|приз\w*|выигрыш\w*|выиграли)\b/i,
-
-  // Link / CTA action: e.g. "linkga bosing", "havolaga kiring", "saytga o'ting", "linkni bosing", "havolani bosing"
   LINK_ACTION: /\b(?:link|havola|sayt|bot|web|url|линк|ҳавола|сайт|бот|ссылк\w*)\w*\s*(?:orqali\s*)?(?:bos(?:ing|ingiz|ish|adi)?|kir(?:ing|ingiz|ish|adi)?|o['ʻ’`]?t(?:ing|ingiz|ish|adi)?|och(?:ing|ingiz|ish|adi)?|кўр(?:инг)?|бос(?:инг)?|кир(?:инг)?|ўт(?:инг)?|оч(?:инг)?|переход\w*|нажми\w*|клик\w*)\b|\b(?:bos(?:ing|ingiz)?|kir(?:ing|ingiz)?|o['ʻ’`]?t(?:ing|ingiz)?|och(?:ing|ingiz)?|бос(?:инг)?|кир(?:инг)?|ўт(?:инг)?|оч(?:инг)?|нажми\w*)\s*(?:uchun\s*)?(?:link|havola|sayt|bot|линк|ҳавола|сайт|бот|ссылк\w*)\w*\b/i,
-
-  // Direct card & SMS phishing
   CARD_OR_SMS_PROMPT: /\b(?:karta|plastik|карта|пластик)\w*\s*(?:raqam|parol|kod|номер|пароль|pin)\w*\b|\b(?:sms|смс)\s*(?:kod|код|tasdiqlash|тасдиқлаш)\w*\b|\b(?:kodni|kod|parolni|parol|кодни|код|пароль)\w*\s*(?:yubor|ber|ayt|yoz|kirit|юбор|бер|айт|ёз|кирит|отправ|пришл|сообщ)\w*\b/i,
-
-  // Money multiplier (doubling schemes)
   MONEY_MULTIPLIER: /\b(?:(?:2|3|5|10|ikki|uch|besh|икки|уч|беш)\s*barobar|удво\w*|2x|3x|5x|10x)\b/i,
-
-  // Advance fee / withdrawal commission trap
   ADVANCE_FEE_TRAP: /\b(?:yech(?:ish|ib olish)?|chiqar(?:ish|ib olish)?|ечиб олиш|вывод\w*)\s*(?:uchun\s*)?(?:to['ʻ’`]?lov|komissiya|soliq|avans|тўлов|комиссия|солиқ|оплат\w*)\b|\b(?:oldindan|аванс)\s*(?:to['ʻ’`]?lov|тўлов|оплат\w*)\b/i,
-
-  // Telegram session hijack / voting contest
   TELEGRAM_HIJACK: /\b(?:ovoz|голос)\w*\s*(?:ber(?:ing|ingiz|ish)?|дав\w*)\b|\b(?:tanlov|musobaqa|конкурс)\w*\s*(?:uchun|qatnash|ovoz)\w*\b/i,
-
-  // Government subsidy / aid impersonation
   GOV_SUBSIDY: /\b(?:prezident|davlat|vazirlik|hokimlik|pensiya|mib|президент|давлат|пенсия)\w*\s*(?:yordam|kompensatsiya|qaror|farmon|sovg['ʻ’`]?a|ёрдам|компенсация|қарор|фармон)\w*\b|\b(?:bolalar|bola)\s*(?:uchun\s*)?(?:kompensatsiya|yordam|pul|nafaqa)\b|\b(?:болалар|бола)\s*(?:учун\s*)?(?:компенсация|ёрдам|пул|нафақа)\b/i
 };
 
 /**
- * Standard Categories with Suffix-Tolerant Lemmatization
+ * Categorical Dictionary
  */
 const SCAM_CATEGORIES = {
   CRITICAL_PHISHING: {
@@ -127,7 +139,7 @@ const SCAM_CATEGORIES = {
       '100% kafolat', '100% garantiya', 'investitsiya qilib kuniga', 'moliyaviy piramida',
       'pul tikib', 'oyiga 5000$', 'kuniga 100$', 'kuniga 500$', 'pulni ko\'paytir',
       'пулни икки баробар', 'пулни 2 баробар', 'кунига пул ишла', 'тез бойи',
-      'кафолатланган даромад', 'кафолатланган фойда', '100% кафолат', '100% гарантия', 'молиявий пирамида',
+      'кафолатланган даромад', '100% кафолат', '100% гарантия', 'молиявий пирамида',
       'удвоить деньги', 'гарантированный доход', 'заработок за 2 часа'
     ]
   },
@@ -196,7 +208,6 @@ function escapeRegex(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-// Precompile category patterns with suffix tolerance
 const compiledCategories = Object.values(SCAM_CATEGORIES).map(cat => {
   const sortedPatterns = [...cat.patterns].sort((a, b) => b.length - a.length);
   const regexString = sortedPatterns
@@ -219,11 +230,11 @@ const compiledCategories = Object.values(SCAM_CATEGORIES).map(cat => {
 });
 
 /**
- * Advanced content analyzer with Combinatorial Fast-Paths
+ * Unified Multi-Layer Content Analyzer
  */
 function analyzeContent(rawText, threshold = 4.5, lang = 'uz') {
   if (!rawText || rawText.trim().length < 15) {
-    return { isScam: false, score: 0, categories: [], matchedKeywords: [], riskLevel: 'LOW' };
+    return { isScam: false, score: 0, mlProbability: 0, categories: [], matchedKeywords: [], riskLevel: 'LOW' };
   }
 
   const normalized = normalizeUzbekText(rawText);
@@ -233,34 +244,58 @@ function analyzeContent(rawText, threshold = 4.5, lang = 'uz') {
   const fastPathHits = [];
   let isFastPathScam = false;
 
-  // 1. EXTRACT SEMANTIC FEATURES (NER & Intent)
-  const hasMoneyAmount = SEMANTIC_FEATURES.MONEY_AMOUNT.test(normalized);
-  const hasWinPrize = SEMANTIC_FEATURES.WIN_PRIZE.test(normalized);
-  const hasLinkAction = SEMANTIC_FEATURES.LINK_ACTION.test(normalized);
-  const hasCardSmsPrompt = SEMANTIC_FEATURES.CARD_OR_SMS_PROMPT.test(normalized);
-  const hasMoneyMultiplier = SEMANTIC_FEATURES.MONEY_MULTIPLIER.test(normalized);
-  const hasAdvanceFee = SEMANTIC_FEATURES.ADVANCE_FEE_TRAP.test(normalized);
-  const hasTelegramHijack = SEMANTIC_FEATURES.TELEGRAM_HIJACK.test(normalized);
-  const hasGovSubsidy = SEMANTIC_FEATURES.GOV_SUBSIDY.test(normalized);
+  // LAYER 1 & 3: BEHAVIORAL HEURISTICS & OBFUSCATION ANALYSIS
+  const heuristics = getHeuristics();
+  let heuristicData = { urgencyIndex: 0, baitProximity: false, urlRisk: false, heuristicScore: 0 };
+  let deobfuscated = normalized;
 
-  // Capture matched semantic strings for user display
+  if (heuristics) {
+    heuristicData = heuristics.evaluate(rawText);
+    deobfuscated = heuristicData.deobfuscatedText || normalized;
+    totalScore += heuristicData.heuristicScore * 0.8;
+  }
+
+  // LAYER 2: MACHINE LEARNING PROBABILISTIC CLASSIFIER (Naive Bayes)
+  const ML = getML();
+  let mlProbability = 0.0;
+  let mlLogOdds = 0.0;
+
+  if (ML) {
+    const mlRes = ML.classify(deobfuscated);
+    mlProbability = mlRes.scamProbability;
+    mlLogOdds = mlRes.logOdds;
+    // Scale ML probability to score
+    totalScore += mlProbability * 5.0;
+
+    mlRes.topFeatures.forEach(f => {
+      if (f.weight > 2.0) matchedKeywords.add(f.token);
+    });
+  }
+
+  // LAYER 4: SEMANTIC INTENT & FAST-PATHS
+  const hasMoneyAmount = SEMANTIC_FEATURES.MONEY_AMOUNT.test(deobfuscated);
+  const hasWinPrize = SEMANTIC_FEATURES.WIN_PRIZE.test(deobfuscated);
+  const hasLinkAction = SEMANTIC_FEATURES.LINK_ACTION.test(deobfuscated);
+  const hasCardSmsPrompt = SEMANTIC_FEATURES.CARD_OR_SMS_PROMPT.test(deobfuscated);
+  const hasMoneyMultiplier = SEMANTIC_FEATURES.MONEY_MULTIPLIER.test(deobfuscated);
+  const hasAdvanceFee = SEMANTIC_FEATURES.ADVANCE_FEE_TRAP.test(deobfuscated);
+  const hasTelegramHijack = SEMANTIC_FEATURES.TELEGRAM_HIJACK.test(deobfuscated);
+  const hasGovSubsidy = SEMANTIC_FEATURES.GOV_SUBSIDY.test(deobfuscated);
+
   if (hasMoneyAmount) {
-    const m = normalized.match(SEMANTIC_FEATURES.MONEY_AMOUNT);
+    const m = deobfuscated.match(SEMANTIC_FEATURES.MONEY_AMOUNT);
     if (m) matchedKeywords.add(m[0]);
   }
   if (hasWinPrize) {
-    const m = normalized.match(SEMANTIC_FEATURES.WIN_PRIZE);
+    const m = deobfuscated.match(SEMANTIC_FEATURES.WIN_PRIZE);
     if (m) matchedKeywords.add(m[0]);
   }
   if (hasLinkAction) {
-    const m = normalized.match(SEMANTIC_FEATURES.LINK_ACTION);
+    const m = deobfuscated.match(SEMANTIC_FEATURES.LINK_ACTION);
     if (m) matchedKeywords.add(m[0]);
   }
 
-  // 2. HIGH-CONFIDENCE COMBINATORIAL FAST-PATHS (Instant Scams)
-
-  // Fast-Path A: Winner / Lottery Bait + (Link/CTA Action OR Money Amount)
-  // Catches: "Siz 5 mln yutib oldingiz. Bu linkga bosing"
+  // Fast-Path Rules (Immediate Critical Triggers)
   if (hasWinPrize && (hasLinkAction || hasMoneyAmount || hasCardSmsPrompt)) {
     isFastPathScam = true;
     totalScore += 8.5;
@@ -270,7 +305,6 @@ function analyzeContent(rawText, threshold = 4.5, lang = 'uz') {
     });
   }
 
-  // Fast-Path B: Card Credentials / SMS verification codes requested
   if (hasCardSmsPrompt) {
     isFastPathScam = true;
     totalScore += 9.0;
@@ -280,7 +314,6 @@ function analyzeContent(rawText, threshold = 4.5, lang = 'uz') {
     });
   }
 
-  // Fast-Path C: Telegram Voting / Contest hijacking
   if (hasTelegramHijack && (hasLinkAction || hasCardSmsPrompt)) {
     isFastPathScam = true;
     totalScore += 8.5;
@@ -290,7 +323,6 @@ function analyzeContent(rawText, threshold = 4.5, lang = 'uz') {
     });
   }
 
-  // Fast-Path D: Money Doubling Ponzi + Action/Urgency
   if (hasMoneyMultiplier && (hasLinkAction || hasMoneyAmount)) {
     isFastPathScam = true;
     totalScore += 8.0;
@@ -300,7 +332,6 @@ function analyzeContent(rawText, threshold = 4.5, lang = 'uz') {
     });
   }
 
-  // Fast-Path E: Fake Government Subsidy + Link
   if (hasGovSubsidy && (hasLinkAction || hasMoneyAmount)) {
     isFastPathScam = true;
     totalScore += 8.0;
@@ -310,9 +341,9 @@ function analyzeContent(rawText, threshold = 4.5, lang = 'uz') {
     });
   }
 
-  // 3. REGULAR CATEGORY MATCHING (Pattern weights)
+  // Category Matching
   for (const cat of compiledCategories) {
-    const matches = normalized.match(cat.regex);
+    const matches = deobfuscated.match(cat.regex);
     if (matches && matches.length > 0) {
       const cleanKeywords = matches.map(m => m.trim().toLowerCase());
       cleanKeywords.forEach(kw => matchedKeywords.add(kw));
@@ -335,7 +366,6 @@ function analyzeContent(rawText, threshold = 4.5, lang = 'uz') {
     }
   }
 
-  // Merge fast-path hits into categories if not present
   for (const fp of fastPathHits) {
     if (!matchedCategories.some(c => c.id === fp.id)) {
       matchedCategories.unshift({
@@ -348,22 +378,37 @@ function analyzeContent(rawText, threshold = 4.5, lang = 'uz') {
     }
   }
 
-  // FINAL SCAM DECISION:
-  // True if any fast-path triggered OR (score >= threshold AND (hasCritical || >= 2 categories))
+  // UNIFIED DECISION LOGIC:
+  // True if:
+  // 1. Any high-confidence fast-path triggered OR
+  // 2. ML Probability >= 85% OR
+  // 3. (ML Probability >= 65% AND heuristics indicate high urgency/proximity) OR
+  // 4. (totalScore >= threshold AND (hasCritical || >= 2 categories))
   const hasCritical = matchedCategories.some(c => c.critical);
-  const isScam = isFastPathScam || (totalScore >= threshold && (hasCritical || matchedCategories.length >= 2));
+  const isHighMlScam = mlProbability >= 0.85;
+  const isMlPlusHeuristicScam = mlProbability >= 0.65 && (heuristicData.urgencyIndex >= 0.4 || heuristicData.baitProximity);
+
+  const isScam = isFastPathScam || isHighMlScam || isMlPlusHeuristicScam ||
+    (totalScore >= threshold && (hasCritical || matchedCategories.length >= 2));
 
   let riskLevel = 'LOW';
-  if (isFastPathScam || hasCritical || totalScore >= 7.0) {
+  if (isFastPathScam || isHighMlScam || hasCritical || totalScore >= 7.0) {
     riskLevel = 'HIGH';
-  } else if (totalScore >= 4.0) {
+  } else if (totalScore >= 4.0 || mlProbability >= 0.5) {
     riskLevel = 'MEDIUM';
   }
 
   return {
     isScam,
     score: parseFloat(totalScore.toFixed(1)),
+    mlProbability: parseFloat((mlProbability * 100).toFixed(1)),
     riskLevel,
+    heuristics: {
+      urgencyIndex: heuristicData.urgencyIndex,
+      baitProximity: heuristicData.baitProximity,
+      urlRisk: heuristicData.urlRisk,
+      urlReasons: heuristicData.urlReasons || []
+    },
     categories: matchedCategories,
     matchedKeywords: Array.from(matchedKeywords)
   };

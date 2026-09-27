@@ -337,21 +337,23 @@
               el.classList.remove('himoya-blurred-content');
             });
             document.querySelectorAll('.himoya-warning-card').forEach(c => c.remove());
+            document.querySelectorAll('.himoya-revealed-ribbon').forEach(r => r.remove());
             flaggedCount = 0;
             notifyBackgroundThreat();
           } else {
             scanPage();
           }
+          sendResponse({ success: true, count: flaggedCount });
         });
-        sendResponse({ success: true, count: flaggedCount });
+        return true; // Keep message channel open for async response
       } else if (msg.type === 'HIMOYA_GET_PAGE_STATUS') {
         sendResponse({
           count: flaggedCount,
           isWhitelisted: isSiteWhitelisted(),
           enabled: config.enabled
         });
+        return true;
       }
-      return true;
     });
   }
 
