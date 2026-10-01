@@ -31,22 +31,35 @@ chrome.runtime.onInstalled.addListener((details) => {
 // Tab threat tracker: tabId -> count
 const tabThreats = new Map();
 
+// Reset tab threat count on navigation / reload
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status === 'loading') {
+    tabThreats.delete(tabId);
+    try {
+      chrome.action.setBadgeText({ tabId, text: '' });
+    } catch (e) {}
+  }
+});
+
 // Message handler from content script and popup
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  if (msg.type === 'HIMOYA_BADGE_UPDATE' && sender.tab) {
+  if (msg.type === 'HIMOYA_BADGE_UPDATE' && sender && sender.tab) {
     const tabId = sender.tab.id;
+    if (!tabId) return;
     const count = msg.count || 0;
     const prevCount = tabThreats.get(tabId) || 0;
 
     tabThreats.set(tabId, count);
 
     // Update badge text
-    if (count > 0) {
-      chrome.action.setBadgeText({ tabId, text: count.toString() });
-      chrome.action.setBadgeBackgroundColor({ tabId, color: '#e11d48' });
-    } else {
-      chrome.action.setBadgeText({ tabId, text: '' });
-    }
+    try {
+      if (count > 0) {
+        chrome.action.setBadgeText({ tabId, text: count.toString() });
+        chrome.action.setBadgeBackgroundColor({ tabId, color: '#e11d48' });
+      } else {
+        chrome.action.setBadgeText({ tabId, text: '' });
+      }
+    } catch (err) {}
 
     // If new threats detected, increment lifetime and daily stats
     if (count > prevCount) {
@@ -76,3 +89,4 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 chrome.tabs.onRemoved.addListener((tabId) => {
   tabThreats.delete(tabId);
 });
+

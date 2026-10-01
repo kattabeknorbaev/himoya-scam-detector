@@ -1,6 +1,6 @@
 /**
- * Himoya Popup Controller v4.5.0
- * Robust UI interactions, multi-layer ML diagnostics, tab switching, and error-safe DOM handlers.
+ * Himoya Popup Controller v5.0.0
+ * Smooth sliding navigation, multi-layer ML diagnostics, keyboard shortcuts, and error-safe DOM handlers.
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -28,9 +28,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Language Pills
   const langPills = document.querySelectorAll('.lang-pill');
 
-  // Navigation Tabs
+  // Navigation Tabs & Slider
   const navBtns = document.querySelectorAll('.nav-btn');
   const tabPanes = document.querySelectorAll('.tab-pane');
+  const navSlider = document.getElementById('navSlider');
   const navShield = document.getElementById('navShield');
   const navChecker = document.getElementById('navChecker');
   const navRules = document.getElementById('navRules');
@@ -39,10 +40,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   const checkerTitle = document.getElementById('checkerTitle');
   const checkerHint = document.getElementById('checkerHint');
   const checkerInput = document.getElementById('checkerInput');
+  const clearInputBtn = document.getElementById('clearInputBtn');
+  const charCounter = document.getElementById('charCounter');
+  const shortcutHint = document.getElementById('shortcutHint');
   const checkMsgBtn = document.getElementById('checkMsgBtn');
   const checkBtnText = document.getElementById('checkBtnText');
   const checkerResult = document.getElementById('checkerResult');
   const resultBox = document.getElementById('resultBox');
+  const copyDiagBtn = document.getElementById('copyDiagBtn');
+  const copyText = document.getElementById('copyText');
+  const copyIcon = document.getElementById('copyIcon');
   const chipBtns = document.querySelectorAll('.chip-btn');
 
   // Rules & Demo
@@ -54,6 +61,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   let currentDomain = '';
   let activeTabId = null;
   let currentLang = 'uz';
+  let lastReportText = '';
+  let currentPageThreats = 0;
+
+  // Position the sliding navigation pill
+  function updateNavSlider(activeBtn) {
+    if (!navSlider || !activeBtn) return;
+    const parent = activeBtn.parentElement;
+    if (!parent) return;
+    const offsetLeft = activeBtn.offsetLeft;
+    const width = activeBtn.offsetWidth;
+    navSlider.style.transform = `translateX(${offsetLeft - 3}px)`;
+    navSlider.style.width = `${width}px`;
+  }
 
   // Apply Language Strings with Null Safety
   function applyLanguage(lang) {
@@ -70,6 +90,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (navChecker) navChecker.textContent = `⚡ ${str.checkerTab || 'Tekshirish'}`;
     if (navRules) navRules.textContent = `📖 ${str.rulesTab || 'Qoidalar'}`;
 
+    // Update nav slider position after text change
+    setTimeout(() => {
+      const activeBtn = document.querySelector('.nav-btn.active');
+      if (activeBtn) updateNavSlider(activeBtn);
+    }, 20);
+
     // Status & Labels
     if (masterToggle) updateStatusDisplay(masterToggle.checked);
     if (statsTodayLabel && str.statsToday) statsTodayLabel.textContent = str.statsToday;
@@ -83,10 +109,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (footerCopy && str.tagline) footerCopy.textContent = str.tagline;
 
     // Scanner
-    if (checkerTitle) checkerTitle.textContent = str.checkerTab || 'Matnni tekshirish';
+    if (checkerTitle) checkerTitle.textContent = str.checkerTab ? `Matnni tekshirish` : 'Matnni tekshirish';
     if (checkerHint && str.checkerPlaceholder) checkerHint.textContent = str.checkerPlaceholder.replace('...', '');
     if (checkerInput && str.checkerPlaceholder) checkerInput.placeholder = str.checkerPlaceholder;
-    if (checkBtnText) checkBtnText.textContent = str.checkerBtn ? str.checkerBtn.replace('🔍 ', '') : 'Xabarni tekshirish';
+    if (checkBtnText) checkBtnText.textContent = str.checkerBtn || 'Xabarni tekshirish';
+    if (shortcutHint && str.shortcutHint) shortcutHint.textContent = str.shortcutHint;
+    if (clearInputBtn && str.clearText) clearInputBtn.title = str.clearText;
+    if (copyText && str.copyDiag) copyText.textContent = str.copyDiag;
+
+    // Update char counter
+    updateCharCounter();
 
     // Rules
     if (rulesList && str.rules) {
@@ -102,6 +134,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   function escapeHtml(str) {
     if (!str) return '';
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function updateCharCounter() {
+    if (!checkerInput || !charCounter) return;
+    const len = (checkerInput.value || '').length;
+    const unit = currentLang === 'ru' ? 'символов' : (currentLang === 'uz_cyr' ? 'белги' : 'belgi');
+    charCounter.textContent = `${len} ${unit}`;
+    if (clearInputBtn) {
+      clearInputBtn.style.display = len > 0 ? 'flex' : 'none';
+    }
   }
 
   // 1. Get current active tab safely
@@ -170,38 +212,44 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (activeTabId && typeof chrome !== 'undefined' && chrome.tabs && chrome.tabs.sendMessage) {
     chrome.tabs.sendMessage(activeTabId, { type: 'HIMOYA_GET_PAGE_STATUS' }, (res) => {
       if (chrome.runtime.lastError || !res) {
-        if (threatCountBadge) {
-          threatCountBadge.textContent = '0';
-          threatCountBadge.classList.remove('has-threats');
-        }
-        if (threatSub) threatSub.textContent = 'Sahifada xavf aniqlanmadi';
+        setThreatDisplay(0);
         return;
       }
-
-      const count = res.count || 0;
-      if (threatCountBadge) {
-        threatCountBadge.textContent = count.toString();
-        if (count > 0) {
-          threatCountBadge.classList.add('has-threats');
-          if (threatSub) threatSub.textContent = `${count} ta xavf bartaraf etildi`;
-        } else {
-          threatCountBadge.classList.remove('has-threats');
-          if (threatSub) threatSub.textContent = 'Sahifada xavf aniqlanmadi';
-        }
-      }
+      setThreatDisplay(res.count || 0);
     });
   }
 
-  // Update Status Display
+  function setThreatDisplay(count) {
+    currentPageThreats = count;
+    const str = (typeof HIMOYA_I18N !== 'undefined' && HIMOYA_I18N[currentLang]) ? HIMOYA_I18N[currentLang] : {};
+    if (threatCountBadge) {
+      threatCountBadge.textContent = count.toString();
+      if (count > 0) {
+        threatCountBadge.classList.add('has-threats');
+        if (threatSub) threatSub.textContent = (str.threatsDetected || '{count} ta xavf bartaraf etildi').replace('{count}', count);
+      } else {
+        threatCountBadge.classList.remove('has-threats');
+        if (threatSub) threatSub.textContent = str.threatsNone || 'Sahifada xavf aniqlanmadi';
+      }
+    }
+    if (masterToggle) {
+      updateStatusDisplay(masterToggle.checked);
+    }
+  }
+
+  // Update Status Display & Pulse Beacon
   function updateStatusDisplay(isEnabled) {
     const str = (typeof HIMOYA_I18N !== 'undefined' && HIMOYA_I18N[currentLang]) ? HIMOYA_I18N[currentLang] : {};
     if (statusDot) {
-      if (isEnabled) {
-        statusDot.className = 'beacon-pulse';
+      if (!isEnabled) {
+        statusDot.className = 'beacon-pulse disabled';
+        if (statusText) statusText.textContent = str.statusDisabled || "Himoya to'xtatilgan";
+      } else if (currentPageThreats > 0) {
+        statusDot.className = 'beacon-pulse alert';
         if (statusText) statusText.textContent = str.statusActive || 'Himoya faol ishlamoqda';
       } else {
-        statusDot.className = 'beacon-pulse disabled';
-        if (statusText) statusText.textContent = str.statusDisabled || 'Himoya to\'xtatilgan';
+        statusDot.className = 'beacon-pulse';
+        if (statusText) statusText.textContent = str.statusActive || 'Himoya faol ishlamoqda';
       }
     }
   }
@@ -209,16 +257,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Update Whitelist Button UI
   function updateWhitelistButtonState(isWhitelisted) {
     if (!whitelistBtn) return;
+    const str = (typeof HIMOYA_I18N !== 'undefined' && HIMOYA_I18N[currentLang]) ? HIMOYA_I18N[currentLang] : {};
     if (isWhitelisted) {
-      whitelistBtn.textContent = 'O\'chirilgan';
+      whitelistBtn.textContent = str.whitelistBtnTrusted || "O'chirilgan";
       whitelistBtn.classList.add('whitelisted');
     } else {
-      whitelistBtn.textContent = 'Ishonchli';
+      whitelistBtn.textContent = str.whitelistBtnTrust || 'Ishonchli';
       whitelistBtn.classList.remove('whitelisted');
     }
   }
 
-  // Event: Tabs Switching
+  // Event: Tabs Switching with Animated Slider Pill
   navBtns.forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
@@ -226,10 +275,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       tabPanes.forEach(c => c.classList.remove('active'));
 
       btn.classList.add('active');
+      updateNavSlider(btn);
+
       const target = document.getElementById(btn.dataset.tab);
       if (target) target.classList.add('active');
     });
   });
+
+  // Initial slider position
+  const initialActiveNav = document.querySelector('.nav-btn.active');
+  if (initialActiveNav) {
+    setTimeout(() => updateNavSlider(initialActiveNav), 50);
+  }
 
   // Event: Language Switch Pills
   langPills.forEach(pill => {
@@ -310,12 +367,41 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  // Textarea input and clear button handlers
+  if (checkerInput) {
+    checkerInput.addEventListener('input', () => {
+      updateCharCounter();
+    });
+
+    // Keyboard shortcut: Ctrl+Enter (or Cmd+Enter)
+    checkerInput.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        runAnalysis();
+      }
+    });
+  }
+
+  if (clearInputBtn) {
+    clearInputBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (checkerInput) {
+        checkerInput.value = '';
+        updateCharCounter();
+        checkerInput.focus();
+      }
+      if (checkerResult) checkerResult.style.display = 'none';
+      if (copyDiagBtn) copyDiagBtn.style.display = 'none';
+    });
+  }
+
   // Quick Sample Chips Click
   chipBtns.forEach(chip => {
     chip.addEventListener('click', (e) => {
       e.preventDefault();
       if (checkerInput) {
         checkerInput.value = chip.dataset.sample;
+        updateCharCounter();
         runAnalysis();
       }
     });
@@ -329,10 +415,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  // Copy Diagnostic Report Button Click
+  if (copyDiagBtn) {
+    copyDiagBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      if (!lastReportText) return;
+      const str = (typeof HIMOYA_I18N !== 'undefined' && HIMOYA_I18N[currentLang]) ? HIMOYA_I18N[currentLang] : {};
+      try {
+        await navigator.clipboard.writeText(lastReportText);
+        if (copyText) copyText.textContent = str.copied || 'Nusxalandi!';
+        if (copyIcon) copyIcon.textContent = '✅';
+        setTimeout(() => {
+          if (copyText) copyText.textContent = str.copyDiag || 'Natijani nusxalash';
+          if (copyIcon) copyIcon.textContent = '📋';
+        }, 1800);
+      } catch (err) {}
+    });
+  }
+
   function runAnalysis() {
     if (!checkerInput || !resultBox || !checkerResult) return;
     const text = (checkerInput.value || '').trim();
     if (!text) return;
+
+    const str = (typeof HIMOYA_I18N !== 'undefined' && HIMOYA_I18N[currentLang]) ? HIMOYA_I18N[currentLang] : {};
 
     if (typeof analyzeContent === 'function') {
       const res = analyzeContent(text, 4.0, currentLang);
@@ -360,8 +466,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           : '';
 
         let heuristicNotes = '';
+        const notes = [];
         if (res.heuristics) {
-          const notes = [];
           if (res.heuristics.baitProximity) notes.push('🎣 Yutuq va harakat bevosita bog\'langan (Bait-to-Action)');
           if (res.heuristics.urgencyIndex >= 0.4) notes.push('⏱️ Sun\'iy psixologik shoshiltirish');
           if (res.heuristics.urlRisk) notes.push('🔗 Shubhali yoki yashirin havola formati');
@@ -372,7 +478,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         resultBox.innerHTML = `
           <div class="res-header-row">
-            <span class="res-title">🚨 XAVF: FIRIBGARLIK ANIQLANDI</span>
+            <span class="res-title">${escapeHtml(str.checkerScam || '🚨 XAVF: FIRIBGARLIK ANIQLANDI')}</span>
             <span class="res-badge high">${res.riskLevel}</span>
           </div>
           ${mlBadge}
@@ -385,6 +491,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             ⚠️ Hech qachon bu havolani ochmang va shaxsiy ma'lumotlaringizni kiritmang!
           </div>
         `;
+
+        lastReportText = `[Himoya AI Xavfsizlik Hisoboti]\nHolat: FIRIBGARLIK (${res.riskLevel})\nAI Ehtimoli: ${res.mlProbability}%\nKategoriyalar: ${res.categories.map(c => c.name).join(', ')}\nAniqlangan belgilar: ${res.matchedKeywords.join(', ')}\nMatn: "${text}"`;
+        if (copyDiagBtn) copyDiagBtn.style.display = 'flex';
       } else {
         resultBox.className = 'result-card safe';
         const mlNote = res.mlProbability 
@@ -392,14 +501,17 @@ document.addEventListener('DOMContentLoaded', async () => {
           : '';
         resultBox.innerHTML = `
           <div class="res-header-row">
-            <span class="res-title" style="color: #166534;">🛡️ SHUBHALI BELGILAR TOPILMADI</span>
+            <span class="res-title" style="color: #166534;">${escapeHtml(str.checkerSafe || '🛡️ SHUBHALI BELGILAR TOPILMADI')}</span>
             <span class="res-badge safe">XAVFSIZ</span>
           </div>
           <div class="res-advice" style="color: #166534;">
-            Xabarda moliyaviy firibgarlik yoki fishing alomatlari aniqlanmadi.
+            ${escapeHtml(str.checkerSafeDesc || 'Xabarda moliyaviy firibgarlik yoki fishing alomatlari aniqlanmadi.')}
           </div>
           ${mlNote}
         `;
+
+        lastReportText = `[Himoya AI Xavfsizlik Hisoboti]\nHolat: XAVFSIZ\nAI Ehtimoli: ${res.mlProbability}%\nMatn: "${text}"`;
+        if (copyDiagBtn) copyDiagBtn.style.display = 'flex';
       }
     }
   }
@@ -425,7 +537,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const str = (typeof HIMOYA_I18N !== 'undefined' && HIMOYA_I18N[currentLang]) ? HIMOYA_I18N[currentLang] : {};
         const card = document.createElement('div');
         card.className = 'demo-warning-overlay';
-        card.style.cssText = 'background:#ffffff;border:1.5px solid #e11d48;border-radius:12px;padding:12px;margin-bottom:8px;box-shadow:0 4px 12px rgba(225,29,72,0.15);';
+        card.style.cssText = 'background:#ffffff;border:1.5px solid #e11d48;border-radius:12px;padding:12px;margin-bottom:8px;box-shadow:0 4px 14px rgba(225,29,72,0.15);animation:fadeIn 0.2s ease;';
         card.innerHTML = `
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
             <strong style="font-size:12px;color:#0f172a;">🛡️ ${str.cardTitle || 'Himoya: Shubhali post aniqlandi'}</strong>
@@ -452,17 +564,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (activeTabId && typeof chrome !== 'undefined' && chrome.tabs && chrome.tabs.sendMessage) {
       chrome.tabs.sendMessage(activeTabId, { type: 'HIMOYA_SETTINGS_CHANGED' }, (response) => {
         if (!chrome.runtime.lastError && response) {
-          const count = response.count || 0;
-          if (threatCountBadge) {
-            threatCountBadge.textContent = count.toString();
-            if (count > 0) {
-              threatCountBadge.classList.add('has-threats');
-              if (threatSub) threatSub.textContent = `${count} ta xavf bartaraf etildi`;
-            } else {
-              threatCountBadge.classList.remove('has-threats');
-              if (threatSub) threatSub.textContent = 'Sahifada xavf aniqlanmadi';
-            }
-          }
+          setThreatDisplay(response.count || 0);
         }
       });
     }

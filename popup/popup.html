@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Himoya</title>
+  <title>Himoya AI</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
@@ -11,15 +11,15 @@
     <!-- Header -->
     <header class="header">
       <div class="brand">
-        <!-- Modern Cyber Shield SVG Logo -->
-        <svg class="brand-logo" width="30" height="30" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Modern Cyber Shield SVG Logo with Soft Radial Glow -->
+        <svg class="brand-logo" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id="shieldGrad" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
               <stop offset="0%" stop-color="#E11D48"/>
               <stop offset="100%" stop-color="#4F46E5"/>
             </linearGradient>
             <filter id="shieldGlow" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#E11D48" flood-opacity="0.35"/>
+              <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#E11D48" flood-opacity="0.3"/>
             </filter>
           </defs>
           <path d="M16 2.5L27 6.5V16C27 22.8 22.3 28.5 16 30C9.7 28.5 5 22.8 5 16V6.5L16 2.5Z" fill="url(#shieldGrad)" filter="url(#shieldGlow)"/>
@@ -32,7 +32,7 @@
             <h1 class="brand-title">Himoya</h1>
             <span class="pro-badge">PRO</span>
           </div>
-          <span class="brand-version">v4.0.0</span>
+          <span class="brand-version">v5.0.0</span>
         </div>
       </div>
 
@@ -52,8 +52,9 @@
       </div>
     </header>
 
-    <!-- Segmented Navigation Bar -->
-    <nav class="nav-segment">
+    <!-- Segmented Navigation Bar with Animated Slider Pill -->
+    <nav class="nav-segment" id="navSegment">
+      <div class="nav-slider" id="navSlider"></div>
       <button type="button" class="nav-btn active" data-tab="tab-shield" id="navShield">
         🛡️ Himoya
       </button>
@@ -105,7 +106,7 @@
       <!-- Sensitivity Control -->
       <div class="glass-card config-card">
         <div class="config-label-row">
-          <span class="config-label" id="sensitivityLabel">Aniqlash sezgirligi</span>
+          <span class="config-label" id="sensitivityLabel">Aniqlash sezgirligi:</span>
         </div>
         <div class="segmented-control">
           <label class="segment-opt">
@@ -152,10 +153,19 @@
           </button>
         </div>
 
-        <textarea id="checkerInput" class="scanner-textarea" rows="3" placeholder="Shubhali xabarni shu yerga qo'ying..."></textarea>
+        <!-- Textarea with Clean Clear Button -->
+        <div class="textarea-wrapper">
+          <textarea id="checkerInput" class="scanner-textarea" rows="3" placeholder="Shubhali xabarni shu yerga qo'ying..."></textarea>
+          <button type="button" class="btn-clear-input" id="clearInputBtn" title="Tozalash" style="display: none;">✕</button>
+        </div>
+
+        <div class="scanner-footer-meta">
+          <span class="char-counter" id="charCounter">0 belgi</span>
+          <span class="shortcut-hint" id="shortcutHint">Ctrl+Enter ↵</span>
+        </div>
         
         <button type="button" class="btn-primary" id="checkMsgBtn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
@@ -167,6 +177,9 @@
           <div class="result-card" id="resultBox">
             <!-- Dynamically populated -->
           </div>
+          <button type="button" class="btn-copy-diag" id="copyDiagBtn" style="display: none;">
+            <span id="copyIcon">📋</span> <span id="copyText">Natijani nusxalash</span>
+          </button>
         </div>
       </div>
     </div>

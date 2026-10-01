@@ -102,7 +102,8 @@
    */
   function applyScamWarning(element, result) {
     if (!element || scannedElements.has(element)) return;
-    if (element.closest('.himoya-flagged-wrapper')) return;
+    if (element.classList.contains('himoya-warning-card') || element.closest('.himoya-warning-card')) return;
+    if (element.classList.contains('himoya-blurred-content') || element.closest('.himoya-blurred-content')) return;
 
     scannedElements.add(element);
     flaggedCount++;
@@ -151,17 +152,13 @@
     // Apply blur to target
     element.classList.add('himoya-blurred-content');
 
-    // Safe insertion
+    // Safe sibling insertion without reparenting (preserves React/Vue/Angular virtual DOM)
     if (isTableCell) {
       element.prepend(card);
     } else {
       const parent = element.parentNode;
       if (parent) {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'himoya-flagged-wrapper';
-        parent.insertBefore(wrapper, element);
-        wrapper.appendChild(card);
-        wrapper.appendChild(element);
+        parent.insertBefore(card, element);
       } else {
         return;
       }
@@ -179,7 +176,10 @@
       ribbon.className = 'himoya-revealed-ribbon';
       const catName = result.categories[0]?.name || 'Shubhali';
       ribbon.innerHTML = `
-        <span>${escapeHtml(strings.ribbonTitle || '🛡️ Himoya: Ogohlantirish ochildi')} (${escapeHtml(catName)})</span>
+        <div class="himoya-ribbon-left">
+          <span class="himoya-ribbon-shield">🛡️</span>
+          <span>${escapeHtml(strings.ribbonTitle || 'Himoya: Ogohlantirish ochildi')} (${escapeHtml(catName)})</span>
+        </div>
         <button type="button" class="himoya-reblur-btn">${escapeHtml(strings.ribbonReblur || 'Qayta yashirish')}</button>
       `;
 
@@ -190,7 +190,11 @@
         ribbon.remove();
       });
 
-      card.parentNode.insertBefore(ribbon, card);
+      if (isTableCell) {
+        element.prepend(ribbon);
+      } else if (card.parentNode) {
+        card.parentNode.insertBefore(ribbon, card);
+      }
     });
 
     // Event: Dismiss as false positive
@@ -214,7 +218,19 @@
   // Scan an individual DOM element
   function evaluateElement(el) {
     if (!el || scannedElements.has(el)) return;
-    if (el.closest('.himoya-flagged-wrapper') || el.classList.contains('himoya-warning-card')) {
+    if (
+      el.classList.contains('himoya-warning-card') ||
+      el.closest('.himoya-warning-card') ||
+      el.classList.contains('himoya-revealed-ribbon') ||
+      el.closest('.himoya-revealed-ribbon') ||
+      el.classList.contains('himoya-blurred-content')
+    ) {
+      scannedElements.add(el);
+      return;
+    }
+
+    // Do not flag an outer container if it already has a flagged child inside
+    if (el.querySelector('.himoya-warning-card, .himoya-blurred-content')) {
       scannedElements.add(el);
       return;
     }

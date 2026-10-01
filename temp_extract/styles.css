@@ -1,46 +1,55 @@
-/* Himoya Extension Modern Styles v3.0.0 */
+/* ==========================================================================
+   Himoya Cybersecurity In-Page Overlay & Shield System v5.0.0
+   Modern frosted glassmorphism, non-destructive DOM styling, micro-animations
+   ========================================================================== */
 
 :root {
-  --himoya-red-bg: #fff1f2;
-  --himoya-red-border: #f43f5e;
-  --himoya-red-text: #9f1239;
-  --himoya-accent: #e11d48;
-  --himoya-shadow: 0 10px 25px -5px rgba(225, 29, 72, 0.15), 0 8px 10px -6px rgba(225, 29, 72, 0.1);
+  --himoya-primary: #e11d48;
+  --himoya-primary-hover: #be123c;
+  --himoya-primary-grad: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+  --himoya-border: rgba(225, 29, 72, 0.3);
+  --himoya-shadow: 0 12px 32px -4px rgba(225, 29, 72, 0.14), 0 4px 14px -2px rgba(15, 23, 42, 0.08);
 }
 
-/* Post Container wrapper when flagged */
-.himoya-flagged-wrapper {
-  position: relative !important;
-  margin: 12px 0 !important;
-  border-radius: 12px !important;
-  overflow: visible !important;
-  transition: all 0.3s ease !important;
-}
-
-/* Blurred post content */
+/* Blurred post content with buttery-smooth transition */
 .himoya-blurred-content {
-  filter: blur(8px) grayscale(20%) !important;
-  opacity: 0.35 !important;
+  filter: blur(9px) grayscale(30%) !important;
+  opacity: 0.28 !important;
   pointer-events: none !important;
   user-select: none !important;
-  transition: filter 0.35s ease, opacity 0.35s ease !important;
+  transition: filter 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-/* Warning Card Overlay */
+/* Modern Frosted Glass Warning Card */
 .himoya-warning-card {
   display: block !important;
-  background: #ffffff !important;
-  border: 2px solid var(--himoya-red-border) !important;
-  border-radius: 12px !important;
+  position: relative !important;
+  box-sizing: border-box !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1.5px solid var(--himoya-border) !important;
+  border-radius: 14px !important;
   padding: 16px 18px !important;
-  margin-bottom: 10px !important;
+  margin: 10px 0 !important;
   box-shadow: var(--himoya-shadow) !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
-  color: #1e293b !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', Helvetica, Arial, sans-serif !important;
+  color: #0f172a !important;
   z-index: 99999 !important;
   text-align: left !important;
   line-height: 1.5 !important;
-  box-sizing: border-box !important;
+  animation: himoyaSlideDown 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+@keyframes himoyaSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .himoya-header-row {
@@ -48,7 +57,7 @@
   align-items: center !important;
   justify-content: space-between !important;
   margin-bottom: 10px !important;
-  gap: 8px !important;
+  gap: 10px !important;
 }
 
 .himoya-header-left {
@@ -58,30 +67,35 @@
 }
 
 .himoya-shield-icon {
-  font-size: 24px !important;
+  font-size: 22px !important;
   line-height: 1 !important;
+  filter: drop-shadow(0 2px 4px rgba(225, 29, 72, 0.25)) !important;
 }
 
 .himoya-title {
-  font-size: 15px !important;
-  font-weight: 700 !important;
+  font-size: 14.5px !important;
+  font-weight: 800 !important;
   color: #0f172a !important;
+  letter-spacing: -0.2px !important;
   margin: 0 !important;
+  line-height: 1.2 !important;
 }
 
 .himoya-risk-badge {
-  font-size: 11px !important;
-  font-weight: 700 !important;
+  font-size: 10.5px !important;
+  font-weight: 800 !important;
   text-transform: uppercase !important;
   letter-spacing: 0.5px !important;
-  padding: 3px 8px !important;
-  border-radius: 6px !important;
+  padding: 3px 9px !important;
+  border-radius: 20px !important;
+  white-space: nowrap !important;
 }
 
 .himoya-risk-badge.high {
   background: #ffe4e6 !important;
   color: #e11d48 !important;
   border: 1px solid #fecdd3 !important;
+  box-shadow: 0 1px 3px rgba(225, 29, 72, 0.15) !important;
 }
 
 .himoya-risk-badge.medium {
@@ -91,9 +105,10 @@
 }
 
 .himoya-body-desc {
-  font-size: 13.5px !important;
+  font-size: 13px !important;
   color: #475569 !important;
   margin: 0 0 10px 0 !important;
+  line-height: 1.45 !important;
 }
 
 .himoya-tags-list {
@@ -107,48 +122,55 @@
   background: #f1f5f9 !important;
   color: #334155 !important;
   border: 1px solid #e2e8f0 !important;
-  font-size: 12px !important;
-  padding: 2px 8px !important;
-  border-radius: 4px !important;
-  font-weight: 500 !important;
+  font-size: 11.5px !important;
+  padding: 3px 9px !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
 }
 
 .himoya-actions-row {
   display: flex !important;
   align-items: center !important;
   gap: 10px !important;
-  padding-top: 8px !important;
+  padding-top: 10px !important;
   border-top: 1px solid #f1f5f9 !important;
 }
 
 .himoya-btn {
   display: inline-flex !important;
   align-items: center !important;
+  justify-content: center !important;
   gap: 6px !important;
-  font-size: 13px !important;
-  font-weight: 600 !important;
-  padding: 6px 14px !important;
-  border-radius: 6px !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  padding: 7px 16px !important;
+  border-radius: 8px !important;
   cursor: pointer !important;
   border: none !important;
-  transition: all 0.15s ease !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
   outline: none !important;
   user-select: none !important;
 }
 
 .himoya-btn-primary {
-  background: #e11d48 !important;
+  background: var(--himoya-primary-grad) !important;
   color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(225, 29, 72, 0.28) !important;
 }
 
 .himoya-btn-primary:hover {
-  background: #be123c !important;
   transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.4) !important;
+}
+
+.himoya-btn-primary:active {
+  transform: translateY(0) !important;
 }
 
 .himoya-btn-secondary {
   background: #f1f5f9 !important;
   color: #475569 !important;
+  border: 1px solid #e2e8f0 !important;
 }
 
 .himoya-btn-secondary:hover {
@@ -156,30 +178,47 @@
   color: #0f172a !important;
 }
 
-/* Minimalist ribbon when unblurred */
+/* Minimalist ribbon when post is temporarily unblurred */
 .himoya-revealed-ribbon {
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
+  box-sizing: border-box !important;
   background: #f8fafc !important;
-  border: 1px solid #cbd5e1 !important;
+  border: 1px solid #e2e8f0 !important;
+  border-left: 3.5px solid var(--himoya-primary) !important;
   border-radius: 8px !important;
-  padding: 6px 12px !important;
-  margin-bottom: 8px !important;
+  padding: 8px 12px !important;
+  margin: 6px 0 !important;
   font-size: 12px !important;
-  color: #64748b !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  color: #475569 !important;
+  animation: himoyaSlideDown 0.2s ease forwards !important;
+}
+
+.himoya-ribbon-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-weight: 500 !important;
+}
+
+.himoya-ribbon-shield {
+  font-size: 14px !important;
 }
 
 .himoya-reblur-btn {
-  background: transparent !important;
-  border: none !important;
-  color: #e11d48 !important;
-  font-weight: 600 !important;
+  background: #fee2e2 !important;
+  border: 1px solid #fecdd3 !important;
+  color: var(--himoya-primary) !important;
+  font-weight: 700 !important;
   cursor: pointer !important;
-  padding: 0 !important;
-  font-size: 12px !important;
+  padding: 3px 10px !important;
+  border-radius: 6px !important;
+  font-size: 11.5px !important;
+  transition: all 0.15s ease !important;
 }
 
 .himoya-reblur-btn:hover {
-  text-decoration: underline !important;
+  background: #fecdd3 !important;
 }
