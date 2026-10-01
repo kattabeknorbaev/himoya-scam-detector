@@ -1,6 +1,6 @@
 /**
- * Himoya Popup Controller v5.0.0
- * Smooth sliding navigation, multi-layer ML diagnostics, keyboard shortcuts, and error-safe DOM handlers.
+ * Himoya Popup Controller v5.1.0
+ * Cyber Dark Design System, Sliding Pill Nav, Multi-Layer ML Diagnostics, and Safe DOM Handlers.
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const copyDiagBtn = document.getElementById('copyDiagBtn');
   const copyText = document.getElementById('copyText');
   const copyIcon = document.getElementById('copyIcon');
-  const chipBtns = document.querySelectorAll('.chip-btn');
+  const chipBtns = document.querySelectorAll('.sample-chip');
 
   // Rules & Demo
   const rulesList = document.getElementById('rulesList');
@@ -85,16 +85,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       pill.classList.toggle('active', pill.dataset.lang === lang);
     });
 
-    // Navigation
-    if (navShield) navShield.textContent = `🛡️ ${str.extensionTitle || 'Himoya'}`;
-    if (navChecker) navChecker.textContent = `⚡ ${str.checkerTab || 'Tekshirish'}`;
-    if (navRules) navRules.textContent = `📖 ${str.rulesTab || 'Qoidalar'}`;
+    // Navigation Labels (preserving vector SVG icons)
+    const shieldLabel = navShield?.querySelector('.nav-btn-text');
+    if (shieldLabel) shieldLabel.textContent = str.extensionTitle || 'Himoya';
+    
+    const checkerLabel = navChecker?.querySelector('.nav-btn-text');
+    if (checkerLabel) checkerLabel.textContent = str.checkerTab || 'Tekshirish';
+    
+    const rulesLabel = navRules?.querySelector('.nav-btn-text');
+    if (rulesLabel) rulesLabel.textContent = str.rulesTab || 'Qoidalar';
 
     // Update nav slider position after text change
     setTimeout(() => {
       const activeBtn = document.querySelector('.nav-btn.active');
       if (activeBtn) updateNavSlider(activeBtn);
-    }, 20);
+    }, 25);
 
     // Status & Labels
     if (masterToggle) updateStatusDisplay(masterToggle.checked);
@@ -104,21 +109,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (optStrict && str.sensitivityStrict) optStrict.textContent = str.sensitivityStrict;
     if (optBalanced && str.sensitivityBalanced) optBalanced.textContent = str.sensitivityBalanced;
     if (optRelaxed && str.sensitivityRelaxed) optRelaxed.textContent = str.sensitivityRelaxed;
-    if (audioLabel && str.audioAlertLabel) audioLabel.textContent = `🔔 ${str.audioAlertLabel}`;
-    if (reportLink && str.reportLink) reportLink.textContent = str.reportLink;
+    if (audioLabel && str.audioAlertLabel) audioLabel.textContent = str.audioAlertLabel;
+    
+    const reportSpan = reportLink?.querySelector('span');
+    if (reportSpan && str.reportLink) reportSpan.textContent = str.reportLink.replace('⚠️ ', '');
+    
     if (footerCopy && str.tagline) footerCopy.textContent = str.tagline;
 
     // Scanner
-    if (checkerTitle) checkerTitle.textContent = str.checkerTab ? `Matnni tekshirish` : 'Matnni tekshirish';
+    if (checkerTitle) checkerTitle.textContent = str.checkerTab ? 'Matnni tekshirish' : 'Matnni tekshirish';
     if (checkerHint && str.checkerPlaceholder) checkerHint.textContent = str.checkerPlaceholder.replace('...', '');
     if (checkerInput && str.checkerPlaceholder) checkerInput.placeholder = str.checkerPlaceholder;
-    if (checkBtnText) checkBtnText.textContent = str.checkerBtn || 'Xabarni tekshirish';
+    if (checkBtnText) checkBtnText.textContent = str.checkerBtn ? str.checkerBtn.replace('🔍 ', '') : 'Xabarni tekshirish';
     if (shortcutHint && str.shortcutHint) shortcutHint.textContent = str.shortcutHint;
     if (clearInputBtn && str.clearText) clearInputBtn.title = str.clearText;
     if (copyText && str.copyDiag) copyText.textContent = str.copyDiag;
 
     // Update char counter
     updateCharCounter();
+
+    // Whitelist button
+    if (whitelistBtn) {
+      const isWhitelisted = whitelistBtn.classList.contains('whitelisted');
+      updateWhitelistButtonState(isWhitelisted);
+    }
 
     // Rules
     if (rulesList && str.rules) {
@@ -150,20 +164,42 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     if (typeof chrome !== 'undefined' && chrome.tabs && chrome.tabs.query) {
       const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-      if (tabs && tabs.length > 0 && tabs[0].url) {
-        activeTabId = tabs[0].id;
-        const url = new URL(tabs[0].url);
-        if (url.protocol.startsWith('http')) {
-          currentDomain = url.hostname.toLowerCase();
-          if (siteDomainEl) siteDomainEl.textContent = currentDomain;
+      if (tabs && tabs.length > 0) {
+        const tab = tabs[0];
+        activeTabId = tab.id;
+        const rawUrl = tab.url || tab.pendingUrl || '';
+
+        if (rawUrl) {
+          try {
+            const url = new URL(rawUrl);
+            if (url.protocol === 'http:' || url.protocol === 'https:') {
+              currentDomain = url.hostname.toLowerCase();
+              if (siteDomainEl) siteDomainEl.textContent = currentDomain;
+              if (whitelistBtn) whitelistBtn.style.display = 'inline-flex';
+            } else if (rawUrl.startsWith('chrome://newtab') || rawUrl.startsWith('chrome-search://') || rawUrl.startsWith('about:blank')) {
+              currentDomain = '';
+              if (siteDomainEl) siteDomainEl.textContent = 'Yangi oyna (New Tab)';
+              if (whitelistBtn) whitelistBtn.style.display = 'none';
+            } else {
+              currentDomain = '';
+              if (siteDomainEl) siteDomainEl.textContent = 'Brauzer sahifasi';
+              if (whitelistBtn) whitelistBtn.style.display = 'none';
+            }
+          } catch (e) {
+            currentDomain = '';
+            if (siteDomainEl) siteDomainEl.textContent = 'Yangi oyna';
+            if (whitelistBtn) whitelistBtn.style.display = 'none';
+          }
         } else {
-          if (siteDomainEl) siteDomainEl.textContent = 'Brauzer sahifasi';
+          currentDomain = '';
+          if (siteDomainEl) siteDomainEl.textContent = 'Yangi oyna (New Tab)';
           if (whitelistBtn) whitelistBtn.style.display = 'none';
         }
       }
     }
   } catch (err) {
-    if (siteDomainEl) siteDomainEl.textContent = 'Mavjud emas';
+    currentDomain = '';
+    if (siteDomainEl) siteDomainEl.textContent = 'Brauzer sahifasi';
     if (whitelistBtn) whitelistBtn.style.display = 'none';
   }
 
@@ -237,18 +273,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Update Status Display & Pulse Beacon
+  // Update Status Display & Pulse Radar Core
   function updateStatusDisplay(isEnabled) {
     const str = (typeof HIMOYA_I18N !== 'undefined' && HIMOYA_I18N[currentLang]) ? HIMOYA_I18N[currentLang] : {};
     if (statusDot) {
       if (!isEnabled) {
-        statusDot.className = 'beacon-pulse disabled';
+        statusDot.className = 'radar-center-core disabled';
         if (statusText) statusText.textContent = str.statusDisabled || "Himoya to'xtatilgan";
       } else if (currentPageThreats > 0) {
-        statusDot.className = 'beacon-pulse alert';
+        statusDot.className = 'radar-center-core alert';
         if (statusText) statusText.textContent = str.statusActive || 'Himoya faol ishlamoqda';
       } else {
-        statusDot.className = 'beacon-pulse';
+        statusDot.className = 'radar-center-core';
         if (statusText) statusText.textContent = str.statusActive || 'Himoya faol ishlamoqda';
       }
     }
@@ -258,11 +294,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   function updateWhitelistButtonState(isWhitelisted) {
     if (!whitelistBtn) return;
     const str = (typeof HIMOYA_I18N !== 'undefined' && HIMOYA_I18N[currentLang]) ? HIMOYA_I18N[currentLang] : {};
+    const span = whitelistBtn.querySelector('span');
     if (isWhitelisted) {
-      whitelistBtn.textContent = str.whitelistBtnTrusted || "O'chirilgan";
+      if (span) span.textContent = str.whitelistBtnTrusted || "O'chirilgan";
       whitelistBtn.classList.add('whitelisted');
     } else {
-      whitelistBtn.textContent = str.whitelistBtnTrust || 'Ishonchli';
+      if (span) span.textContent = str.whitelistBtnTrust || 'Ishonchli';
       whitelistBtn.classList.remove('whitelisted');
     }
   }
@@ -448,7 +485,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         resultBox.className = 'result-card scam';
         const tagsHtml = res.categories.map(c => `<span class="res-tag">${escapeHtml(c.name)}</span>`).join('');
         const matchedKw = res.matchedKeywords.length > 0 
-          ? `<div class="res-advice" style="margin-top:6px;"><strong>Aniqlangan belgilar:</strong> ${res.matchedKeywords.map(k => `<code>${escapeHtml(k)}</code>`).join(' ')}</div>`
+          ? `<div class="res-advice" style="margin-top:6px;font-size:11px;color:#fca5a5;"><strong>Aniqlangan belgilar:</strong> ${res.matchedKeywords.map(k => `<code style="background:rgba(255,255,255,0.1);padding:1px 4px;border-radius:3px;">${escapeHtml(k)}</code>`).join(' ')}</div>`
           : '';
 
         const mlBadge = res.mlProbability 
@@ -497,14 +534,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       } else {
         resultBox.className = 'result-card safe';
         const mlNote = res.mlProbability 
-          ? `<div style="font-size:11px;color:#166534;margin-top:4px;">🧠 AI/ML Modeli: ${res.mlProbability}% ehtimol (Xavfsiz)</div>`
+          ? `<div style="font-size:11px;color:#a7f3d0;margin-top:6px;">🧠 AI/ML Modeli: ${res.mlProbability}% ehtimol (Xavfsiz)</div>`
           : '';
         resultBox.innerHTML = `
           <div class="res-header-row">
-            <span class="res-title" style="color: #166534;">${escapeHtml(str.checkerSafe || '🛡️ SHUBHALI BELGILAR TOPILMADI')}</span>
+            <span class="res-title" style="color: #6ee7b7;">${escapeHtml(str.checkerSafe || '🛡️ SHUBHALI BELGILAR TOPILMADI')}</span>
             <span class="res-badge safe">XAVFSIZ</span>
           </div>
-          <div class="res-advice" style="color: #166534;">
+          <div class="res-advice" style="color: #d1fae5;font-size:11.5px;">
             ${escapeHtml(str.checkerSafeDesc || 'Xabarda moliyaviy firibgarlik yoki fishing alomatlari aniqlanmadi.')}
           </div>
           ${mlNote}
@@ -537,14 +574,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const str = (typeof HIMOYA_I18N !== 'undefined' && HIMOYA_I18N[currentLang]) ? HIMOYA_I18N[currentLang] : {};
         const card = document.createElement('div');
         card.className = 'demo-warning-overlay';
-        card.style.cssText = 'background:#ffffff;border:1.5px solid #e11d48;border-radius:12px;padding:12px;margin-bottom:8px;box-shadow:0 4px 14px rgba(225,29,72,0.15);animation:fadeIn 0.2s ease;';
+        card.style.cssText = 'background:rgba(244,63,94,0.12);border:1.5px solid rgba(244,63,94,0.4);border-radius:12px;padding:12px;margin-bottom:8px;box-shadow:0 0 20px rgba(244,63,94,0.2);animation:fadeIn 0.2s ease;';
         card.innerHTML = `
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-            <strong style="font-size:12px;color:#0f172a;">🛡️ ${str.cardTitle || 'Himoya: Shubhali post aniqlandi'}</strong>
-            <span style="font-size:10px;font-weight:800;background:#ffe4e6;color:#e11d48;padding:2px 6px;border-radius:4px;">YUQORI XAVF</span>
+            <strong style="font-size:12px;color:#ffffff;">🛡️ ${str.cardTitle || 'Himoya: Shubhali post aniqlandi'}</strong>
+            <span style="font-size:9.5px;font-weight:800;background:#f43f5e;color:#ffffff;padding:2px 6px;border-radius:4px;">YUQORI XAVF</span>
           </div>
-          <div style="font-size:11px;color:#475569;margin-bottom:8px;">${res.categories.map(c => c.name).join(', ')}</div>
-          <button type="button" style="background:linear-gradient(135deg,#e11d48,#be123c);color:#fff;border:none;padding:5px 14px;border-radius:6px;font-size:11.5px;font-weight:700;cursor:pointer;">${str.cardReveal || "👁️ Ko'rish"}</button>
+          <div style="font-size:11px;color:#fca5a5;margin-bottom:8px;">${res.categories.map(c => c.name).join(', ')}</div>
+          <button type="button" style="background:linear-gradient(135deg,#ff385c,#e11d48);color:#ffffff;border:none;padding:5px 14px;border-radius:6px;font-size:11.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(244,63,94,0.4);">${str.cardReveal || "👁️ Ko'rish"}</button>
         `;
 
         card.querySelector('button').addEventListener('click', () => {
