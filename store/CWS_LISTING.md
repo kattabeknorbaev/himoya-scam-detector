@@ -24,17 +24,18 @@ Protects Uzbek speakers from financial fraud, fake giveaways, and phishing in re
 
 ### Detailed Store Description (English):
 ```text
-Himoya (Uzbek for "Protection") is an open-source browser extension designed to protect Uzbek-speaking internet users from digital financial scams, phishing attacks, and fraudulent investment schemes in real time.
+Himoya (Uzbek for "Protection") is an open-source, privacy-first cybersecurity browser extension designed to protect Uzbek-speaking internet users from digital financial scams, phishing attacks, Trojan APKs, and fraudulent schemes in real time.
 
-Across Central Asia, localized social media scams—such as fake "presidential subsidies", plastic card SMS phishing (Uzcard/Humo), doubling money pyramid schemes, and fake automated trading bots—frequently target vulnerable internet users. Himoya acts as your digital shield.
+Across Central Asia, localized cyber attacks—such as plastic card drainers (Uzcard/Humo), fake "data breach" panic lures, Trojan APK wedding invitations, Telegram account hijacking ("Ovoz bering"), fake government subsidies, and brushing task scams—frequently target unsuspecting internet users. Himoya acts as your institutional-grade digital shield.
 
 🛡️ KEY FEATURES:
-• Dual-Script Support: Comprehensive detection across both Uzbek Latin and Uzbek Cyrillic text.
-• Smart Multi-Category Detection: Weighted scoring system identifies critical phishing (card numbers, SMS verification codes), fake lotteries, and pressure tactics.
-• Minimal False Positives: Sophisticated cross-category evaluation ensures everyday conversations and regular news are never falsely flagged.
-• Non-Disruptive Visual Alerts: Blurs suspected fraudulent posts with clear category tags and provides one-click instant reveal.
-• Complete Privacy Guarantee: 100% client-side execution. Zero data collection, no analytics, no external servers, and zero telemetry.
-• Extension Action Dashboard: View scams blocked on the current page, lifetime statistics, whitelist trusted sites, and configure detection sensitivity (Strict, Balanced, Relaxed).
+• 1,200+ Threat Indicator Model: High-precision probabilistic Naive Bayes NLP model covering card drainers, transit account lures, malicious APKs, and Telegram hijacking.
+• Dual-Script & Russian Support: Native, seamless detection across Uzbek Latin, Uzbek Cyrillic, and regional Russian threat text.
+• Zero False Positives: Calibrated with natural language inhibitors so everyday conversation, news, and school notices are never flagged.
+• Behavioral Heuristics: Analyzes psychological urgency, bait-to-action proximity, suspicious URL shorteners, and obfuscated leetspeak.
+• Non-Disruptive Visual Alerts: Safely blurs suspected fraudulent posts with transparent category badges and instant 1-click reveal.
+• Complete Privacy Guarantee: 100% client-side execution. Zero telemetry, zero analytics, zero external API calls, and no data collection.
+• Extension Dashboard: Live site threat monitor, lifetime statistics, trusted website whitelist, sensitivity controls, and instant text scanner.
 
 🔒 PRIVACY & SECURITY:
 All text scanning happens exclusively within your browser's local memory. No text, URLs, or browsing history is ever transmitted or recorded.
@@ -44,17 +45,18 @@ Himoya is free and open-source under the MIT License.
 
 ### Detailed Store Description (O'zbekcha):
 ```text
-Himoya — O'zbekiston va o'zbekzabon internet foydalanuvchilarini onlayn moliyaviy firibgarliklar, soxta aksiyalar, piramidalar va fishing xabarlaridan real vaqt rejimida himoya qiluvchi bepul brauzer kengaytmasi.
+Himoya — O'zbekiston va o'zbekzabon internet foydalanuvchilarini onlayn moliyaviy firibgarliklar, plastik karta o'g'irligi, zararli APK troyanlar va soxta havolalardan real vaqt rejimida himoya qiluvchi bepul brauzer kengaytmasi.
 
-Internet va ijtimoiy tarmoqlarda keng tarqalgan xavflar — plastik karta ma'lumotlari va SMS kodlarni o'g'irlash, "pulni 2 barobar qilib berish" va'dalari, soxta davlat kompensatsiyalari va shubhali trading botlariga qarshi Himoya sizning ishonchli qalqoningizdir.
+Internet va ijtimoiy tarmoqlarda keng tarqalgan xavflar — "kartangiz sizib chiqdi" vahimalari, soxta to'y taklifnomasi yoki sud qarori APK fayllari, "ovoz bering" niqobidagi Telegram o'g'irlashlar, soxta davlat kompensatsiyalari va layk bosish sxemalariga qarshi Himoya sizning ishonchli qalqoningizdir.
 
 🛡️ ASOSIY IMKONIYATLAR:
-• Lotin va Kirill yozuvlari: O'zbek tilidagi lotin hamda kirill alifbosidagi xabarlarni birdek aniqlaydi.
-• Ko'p bosqichli tahlil: Plastik karta, SMS kod so'rovlari, soxta yutuqlar va shoshiltirish usullarini maxsus tahlil algoritmi orqali tekshiradi.
-• Past xatolik (Low false positives): Oddiy xabarlar yoki yangiliklar asossiz bloklanmaydi — faqat haqiqiy xavf belgilari bo'lgandagina ogohlantiradi.
-• Zamonaviy va qulay interfeys: Shubhali postlarni xavfsiz xiralashtiradi va birgina tugma orqali ko'rish imkonini beradi.
-• 100% Maxfiylik: Barcha tekshiruvlar to'liq brauzeringiz ichida amalga oshiriladi. Hech qanday ma'lumot, matn yoki havola tashqi serverlarga yuborilmaydi.
-• Boshqaruv paneli: Joriy sahifadagi va umumiy to'xtatilgan firibgarliklar statistikasi, oq ro'yxat va sezgirlik darajasi (Kuchli, Standart, Yengil).
+• 1,200+ Tahdid Indikatorlari: Sun'iy intellekt va ehtimollik tahlili (Naive Bayes) asosida eng so'nggi kiberjinoyat usullarini aniqlaydi.
+• Lotin, Kirill va Rus tillari: O'zbek tilidagi lotin, kirill hamda keng tarqalgan ruscha firibgarlik xabarlarini birdek tahlil qiladi.
+• 0% Soxta Ogohlantirish (No False Positives): Maxsus til inhibitatorlari oddiy do'stona suhbatlar, yangiliklar yoki ta'lim xabarlarini asossiz bloklamaydi.
+• Xulq-atvor tahlili: Shoshiltirish usullari, havola xavfi va yashirin leetspeak yozuvlarini ochib beradi.
+• Qulay va zamonaviy interfeys: Xavfli postlarni xiralashtirib ko'rsatadi va bitta tugma bilan xavfsiz ko'rish imkonini beradi.
+• 100% Maxfiylik: Barcha tekshiruvlar to'liq qurilmangiz ichida bajariladi. Hech qanday ma'lumot yoki havolalar tashqi serverlarga yuborilmaydi.
+• Boshqaruv paneli: Jonli monitoring, firibgarliklar statistikasi, oq ro'yxat va matnlarni darhol tekshirish skaneri.
 
 Himoya — o'zbek xalqi xavfsizligi uchun yaratilgan bepul va ochiq kodli loyiha.
 ```

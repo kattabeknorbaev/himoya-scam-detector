@@ -4,6 +4,23 @@ All notable changes to the **Himoya AI Scam Detector** Chrome extension are docu
 
 ---
 
+## [5.3.0] - 2026-10-01
+
+### Added
+- **1,200+ Research-Backed Threat Indicators & N-Grams (`ml_classifier.js`):**
+  - Massive dataset expansion incorporating intelligence from CSEC.uz, CERT.uz, and the Central Bank of Uzbekistan.
+  - **Data Breach Panic Schemes:** Dedicated patterns detecting "baza sizib chiqdi", "kartalar sizishi", and fraudulent transit account demands (`xavfsiz tranzit hisob`).
+  - **Trojan Wedding Invitations & Court Summons:** Detection of malicious APK vectors (`to'y taklifnomasi.apk`, `taklifnoma.apk`, `sud qarori.apk`, `ijro hujjati.apk`, `jarima qarori.apk`).
+  - **Telegram Friend Loan Emergency Hijacks:** Detection of hijacked contact loan requests (`kartam ishlamayapti, 500 ming tashlab tur`).
+  - **Escrow & Delivery Phishing:** Spoofed Click / Payme / OLX delivery links requesting card credentials to "receive money".
+  - **Trilingual Parallel Threat Coverage:** Balanced across Uzbek Latin, Uzbek Cyrillic, and Russian.
+- **Dedicated Threat Category in Engine (`engine.js`):** Added `DATA_BREACH_ALERT` and Fast-Path 9 for instant panic/transit account mitigation.
+- **Automated Test Suite Expansion (`test/test_engine.js`):** Expanded from 26 to 35 comprehensive automated tests passing with 100% accuracy.
+- **Enhanced Sample Chips (`popup/`):** Added 1-click test sample for `Baza sizishi`.
+- **CWS Distribution Build:** Packaged `himoya-extension-v5.3.0.zip` (59.2 KB).
+
+---
+
 ## [5.2.0] - 2026-10-01
 
 ### Added

@@ -1,5 +1,5 @@
 /**
- * Himoya Popup Controller v5.2.0
+ * Himoya Popup Controller v5.3.0
  * Cyber Dark Design System, Sliding Pill Nav, Multi-Layer ML Diagnostics, and Safe DOM Handlers.
  */
 

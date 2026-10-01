@@ -1,6 +1,6 @@
 /**
- * Himoya Unified Intelligence Engine v5.2.0
- * Multi-layer Hybrid Cybersecurity Architecture:
+ * Himoya Unified Intelligence Engine v5.3.0
+ * Multi-layer Hybrid Cybersecurity Architecture (1,200+ Research Indicators):
  * - Layer 1: Homoglyph & Obfuscation De-anonymizer
  * - Layer 2: Machine Learning Probabilistic Text Classifier (Naive Bayes Log-Odds)
  * - Layer 3: Social Engineering & Behavioral Heuristics (Bait-to-CTA Proximity, Urgency, URL Risk)
@@ -59,12 +59,13 @@ const SEMANTIC_FEATURES = {
   ADVANCE_FEE_TRAP: /\b(?:yech(?:ish|ib olish)?|chiqar(?:ish|ib olish)?|ечиб олиш|вывод\w*)\s*(?:uchun\s*)?(?:to['ʻ’`]?lov|komissiya|soliq|avans|depozit|тўлов|комиссия|солиқ|оплат\w*)\b|\b(?:oldindan|аванс)\s*(?:to['ʻ’`]?lov|тўлов|оплат\w*)\b/i,
   TELEGRAM_HIJACK: /\b(?:ovoz|голос)\w*\s*(?:ber(?:ing|ingiz|ish)?|дав\w*)\b|\b(?:tanlov|musobaqa|конкурс)\w*\s*(?:uchun|qatnash|ovoz)\w*\b/i,
   GOV_SUBSIDY: /\b(?:prezident|davlat|vazirlik|hokimlik|pensiya|mib|hududgaz|президент|давлат|пенсия)\w*\s*(?:yordam|kompensatsiya|qaror|farmon|sovg['ʻ’`]?a|ёрдам|компенсация|қарор|фармон)\w*\b|\b(?:bolalar|bola)\s*(?:uchun\s*)?(?:kompensatsiya|yordam|pul|nafaqa)\b|\b(?:болалар|бола)\s*(?:учун\s*)?(?:компенсация|ёрдам|пул|нафақа)\b/i,
-  APK_TROJAN: /\b(?:(?:rasm|foto|ovoz|sovga|update|yangilanish|ilova|dastur|фото)\w*[\s._-]*apk|\.apk\b|apk\s*fayl|apk\s*ilova)\b|\b(?:bu\s*rasmda\s*senmisan|mening\s*rasmimmi|бу\s*расмда\s*сенмисан|это\s*ты\s*на\s*фото)\b/i,
-  TASK_BRUSHING: /\b(?:(?:tovar|mahsulot|uzum|wildberries|ozon)\w*\s*(?:layk|baho|baholash|otziv)\w*)|(?:layk\s*bosib\s*pul\s*ishla)\b/i
+  APK_TROJAN: /\b(?:(?:rasm|foto|ovoz|sovga|update|yangilanish|ilova|dastur|taklifnoma|to['ʻ’`]?y|sud|ijro|jarima|albom|фото|приглашение)\w*[\s._-]*apk|\.apk\b|apk\s*fayl|apk\s*ilova)\b|\b(?:bu\s*rasmda\s*senmisan|mening\s*rasmimmi|бу\s*расмда\s*сенмисан|это\s*ты\s*на\s*фото|to['ʻ’`]?y\s*taklifnomasi|тўй\s*таклифномаси|свадебное\s*приглашение)\b/i,
+  TASK_BRUSHING: /\b(?:(?:tovar|mahsulot|uzum|wildberries|ozon)\w*\s*(?:layk|baho|baholash|otziv)\w*)|(?:layk\s*bosib\s*pul\s*ishla)\b/i,
+  DATA_BREACH_PANIC: /\b(?:karta|hisob|baza|malumot|карта|ҳисоб|база)\w*\s*(?:sizib\s*chiq|tarqal|xavf\s*ostida|bloklan|muzlatil|слит|взломан|утечк)\w*\b|\b(?:tranzit|xavfsiz|транзит|безопасн)\w*\s*(?:hisob|karta|raqam|счет|карт)\w*\b/i
 };
 
 /**
- * 12 Comprehensive Categorical Threat Definitions
+ * 13 Comprehensive Categorical Threat Definitions
  */
 const SCAM_CATEGORIES = {
   CRITICAL_PHISHING: {
@@ -108,20 +109,44 @@ const SCAM_CATEGORIES = {
     ]
   },
 
+  DATA_BREACH_ALERT: {
+    id: 'DATA_BREACH_ALERT',
+    nameUz: 'Soxta ma\'lumotlar sizishi / Tranzit hisob talabi',
+    nameUzCyr: 'Сохта маълумотлар сизиши / Транзит ҳисоб талаби',
+    nameRu: 'Фейковая утечка данных / Требование перевода на транзитный счет',
+    weight: 5.5,
+    critical: true,
+    patterns: [
+      'kartangiz sizib chiqdi', 'baza sizib chiqdi', 'malumotlar sizib chiqdi',
+      'kartalar bazasi tarqaldi', 'kiberhujum aniqlandi', 'tranzit hisobga',
+      'tranzit kartaga', 'xavfsiz hisob raqami', 'mablag\'ingiz xavf ostida',
+      'kiberxavfsizlik xizmati ogohlantiradi', 'shoshilinch xavfsizlik chorasi',
+      'hisobingiz muzlatildi', 'begona qurilma ulandi',
+      'картангиз сизиб чиқди', 'база сизиб чиқди', 'киберҳужум аниқланди',
+      'транзит ҳисобга', 'транзит картага', 'хавфсиз ҳисоб рақами',
+      'утечка базы данных', 'ваша карта скомпрометирована', 'переведите на транзитный счет',
+      'безопасный транзитный счет', 'угроза хищения средств'
+    ]
+  },
+
   MALICIOUS_APK_TROJAN: {
     id: 'MALICIOUS_APK_TROJAN',
-    nameUz: 'Zararli dastur / Soxta foto APK virus',
-    nameUzCyr: 'Зарарли дастур / Сохта фото АПК вирус',
-    nameRu: 'Вредоносный APK-троян / Ложное фото',
+    nameUz: 'Zararli dastur / Soxta foto va taklifnoma APK virus',
+    nameUzCyr: 'Зарарли дастур / Сохта фото ва таклифнома АПК вирус',
+    nameRu: 'Вредоносный APK-троян / Ложное фото и приглашение',
     weight: 5.5,
     critical: true,
     patterns: [
       'bu rasmda senmisan', 'mening rasmimmi', 'rasmda senmisan', 'rasming chiqdi',
       'rasmlar.apk', 'foto.apk', 'telegram_update.apk', 'ovoz.apk', 'sovga.apk',
+      'to\'y taklifnomasi.apk', 'taklifnoma.apk', 'sud qarori.apk', 'ijro hujjati.apk',
+      'jarima qarori.apk', 'albom.apk', 'to\'y taklifnomasi',
       'ilovani o\'rnat', 'dasturni yuklab ol', 'apk fayl', 'faylni oching',
       'бу расмда сенмисан', 'менинг расмимми', 'расмда сенмисан', 'расмлар.апк',
+      'тўй таклифномаси.апк', 'таклифнома.апк', 'суд қарори.апк', 'тўй таклифномаси',
       'фото.апк', 'иловани ўрнат', 'дастурни юклаб ол', 'апк файл',
-      'это ты на фото', 'посмотри фото', 'скачайте apk', 'установите обновление'
+      'это ты на фото', 'посмотри фото', 'скачайте apk', 'установите обновление',
+      'свадебное приглашение.apk', 'судебное решение.apk'
     ]
   },
 
@@ -362,6 +387,7 @@ function analyzeContent(rawText, threshold = 4.5, lang = 'uz') {
   const hasGovSubsidy = SEMANTIC_FEATURES.GOV_SUBSIDY.test(deobfuscated);
   const hasApkTrojan = SEMANTIC_FEATURES.APK_TROJAN.test(deobfuscated);
   const hasTaskBrushing = SEMANTIC_FEATURES.TASK_BRUSHING.test(deobfuscated);
+  const hasBreachPanic = SEMANTIC_FEATURES.DATA_BREACH_PANIC.test(deobfuscated);
 
   // Fast-Path 1: Prize / Money Bait + Call to Action Link
   if ((hasWin || hasMoney) && hasLink) {
@@ -417,6 +443,13 @@ function analyzeContent(rawText, threshold = 4.5, lang = 'uz') {
     isFastPathScam = true;
     fastPathHits.push('Pul yechish uchun oldindan to\'lov talabi');
     totalScore += 5.5;
+  }
+
+  // Fast-Path 9: Data Breach Panic & Safe/Transit Account Trap
+  if (hasBreachPanic && (hasMoney || hasLink || deobfuscated.includes('otkaz') || deobfuscated.includes("o'tkaz") || deobfuscated.includes('ўтказ') || deobfuscated.includes('перевед') || deobfuscated.includes('xavfsiz') || deobfuscated.includes('tranzit'))) {
+    isFastPathScam = true;
+    fastPathHits.push('Soxta ma\'lumotlar sizishi va tranzit hisob talabi');
+    totalScore += 7.0;
   }
 
   // Check Categorical Patterns
