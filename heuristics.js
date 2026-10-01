@@ -63,8 +63,8 @@
     if (!text) return { hasProximity: false, distance: 99 };
     const tokens = text.toLowerCase().split(/\s+/);
 
-    const baitRegex = /\b(?:yut(?:ib|uq|dingiz)?|sovg['ʻ’`]?a|5\s*mln|1000\$|pul|даромад|пул|ютуқ|daromad|kompensatsiya|prezident)\b/i;
-    const actionRegex = /\b(?:link\w*|havola\w*|sayt\w*|bot\w*|ҳавола\w*|бос\w*|bos(?:ing)?|kir(?:ing)?|yubor(?:ing)?|kod|смс|парол|parol)\b/i;
+    const baitRegex = /\b(?:yut(?:ib|uq|dingiz)?|sovg['ʻ’`]?a|5\s*mln|1000\$|pul|даромад|пул|ютуқ|daromad|kompensatsiya|prezident|ovoz|layk|senmisan)\b/i;
+    const actionRegex = /\b(?:link\w*|havola\w*|sayt\w*|bot\w*|ҳавола\w*|бос\w*|bos(?:ing)?|kir(?:ing)?|yubor(?:ing)?|kod|смс|парол|parol|apk|yuklab)\b/i;
 
     let baitIndex = -1;
     let actionIndex = -1;
@@ -78,7 +78,7 @@
     if (baitIndex !== -1 && actionIndex !== -1) {
       const distance = Math.abs(actionIndex - baitIndex);
       return {
-        hasProximity: distance <= 7,
+        hasProximity: distance <= 8,
         distance
       };
     }
@@ -87,7 +87,7 @@
   }
 
   /**
-   * Analyzes URLs, TLDs, Shorteners, and Bots for infrastructure risk
+   * Analyzes URLs, TLDs, Shorteners, APKs, and Bots for infrastructure risk
    */
   function analyzeUrlRisk(text) {
     if (!text) return { hasSuspiciousUrl: false, reasons: [] };
@@ -101,6 +101,9 @@
     }
     if (/\b(?:https?:\/\/)?\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/.test(text)) {
       reasons.push('To\'g\'ridan-to\'g\'ri IP manzil havolasi');
+    }
+    if (/\b[a-zA-Z0-9_\-\.]+\.apk\b/i.test(text) || /\b(?:apk\s*fayl|apk\s*ilova)\b/i.test(text)) {
+      reasons.push('Shubhali Android APK virus fayli');
     }
 
     return {

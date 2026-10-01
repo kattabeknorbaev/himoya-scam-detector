@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy - Himoya Chrome Extension</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: #1e293b;
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 0 20px;
+      background-color: #f8fafc;
+    }
+    .card {
+      background: #ffffff;
+      padding: 36px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e2e8f0;
+    }
+    h1 {
+      color: #e11d48;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 26px;
+      margin-top: 0;
+    }
+    h2 {
+      color: #0f172a;
+      font-size: 18px;
+      margin-top: 24px;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 6px;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    li {
+      margin-bottom: 8px;
+    }
+    .badge {
+      display: inline-block;
+      background: #ffe4e6;
+      color: #e11d48;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+    footer {
+      margin-top: 30px;
+      font-size: 13px;
+      color: #64748b;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🛡️ Himoya Privacy Policy</h1>
+    <div class="badge">100% Client-Side &bull; Zero Data Collection</div>
+    <p><em>Last updated: September 2026</em></p>
+
+    <p>Himoya ("we", "our", or "the extension") is a browser extension created to protect Uzbek-speaking internet users from digital financial scams and online phishing. This Privacy Policy details our strict commitment to privacy and data protection.</p>
+
+    <h2>1. Absolute Zero Data Collection</h2>
+    <p>Himoya does <strong>NOT</strong> collect, transmit, store, track, or share any personal information or web browsing history.</p>
+    <ul>
+      <li><strong>No External Server Communication:</strong> Himoya does not connect to any remote server or external API.</li>
+      <li><strong>No Analytics or Telemetry:</strong> There is no Google Analytics, tracking pixel, cookie, or user telemetry of any kind.</li>
+      <li><strong>Local Processing:</strong> All scam detection patterns, string normalization, and content scanning execute 100% locally inside your browser memory on your personal machine.</li>
+    </ul>
+
+    <h2>2. Permissions Justification</h2>
+    <ul>
+      <li><strong>Storage (<code>chrome.storage.local</code>):</strong> Used exclusively to persist user settings (such as sensitivity level and domain whitelist) and local threat counters directly on your device.</li>
+      <li><strong>Content Scripts (<code>&lt;all_urls&gt;</code>):</strong> Necessary to evaluate text against suspicious fraud patterns in real-time across social media networks, forums, and blogs. Web page content never leaves your browser.</li>
+    </ul>
+
+    <h2>3. Open Source Transparency</h2>
+    <p>Himoya is completely open source under the MIT License. Anyone can inspect and audit the source code on GitHub to verify our security guarantees.</p>
+  </div>
+  <footer>
+    &copy; 2026 Himoya Project. Built for digital safety and community protection.
+  </footer>
+</body>
+</html>

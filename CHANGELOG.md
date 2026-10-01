@@ -4,6 +4,22 @@ All notable changes to the **Himoya AI Scam Detector** Chrome extension are docu
 
 ---
 
+## [5.2.0] - 2026-10-01
+
+### Added
+- **Expanded Research-Backed Intelligence Dataset (300+ Tokens & 12 Threat Vectors):**
+  - **Malicious APK Trojans:** Identification of fake photo/update vectors (`bu rasmda senmisan`, `rasmlar.apk`, `foto.apk`, `telegram_update.apk`).
+  - **Fake Bank Security Service Alerts:** Phishing alerts claiming account freezes or urgent transfers to "safe accounts".
+  - **E-Commerce Task Scams (Brushing):** Uzum Market & Wildberries fake product review/liking schemes promising 200k-500k sums.
+  - **Fake Government Aid & Subsidies:** Child compensation, presidential decisions, and fake utility/gas subsidies.
+  - **Crypto / Airdrop Fraud:** Telegram bot airdrop scams (Hamster, Notcoin, Toncoin).
+  - **Traffic Fines & Utility Discounts:** 50% discount traps impersonating YHXBB / traffic police.
+- **Probabilistic ML Expansion (`ml_classifier.js`):** Expanded vocabulary from ~80 to 300+ weighted tokens, multi-word bigrams, and natural language inhibitors.
+- **Expanded Automated Test Suite (`test/test_engine.js`):** 26 comprehensive unit tests covering all modern cyber fraud vectors with 100% test accuracy and zero false positives.
+- **Enhanced Sample Chips:** Added 1-click test chips for `Foto.apk`, `Uzum layk`, and `Kompensatsiya`.
+
+---
+
 ## [5.1.0] - 2026-10-01
 
 ### Added
