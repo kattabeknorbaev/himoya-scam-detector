@@ -1,0 +1,26 @@
+{
+  "name": "himoya-scam-detector",
+  "version": "5.4.0",
+  "description": "Enterprise-grade client-side cybersecurity engine protecting Central Asian users from card drainers, OTP phishing, and malicious APKs.",
+  "type": "commonjs",
+  "scripts": {
+    "test": "node tests/ahoCorasick.test.js && node tests/normalizer.test.js",
+    "benchmark": "node tests/benchmark.js"
+  },
+  "keywords": [
+    "security",
+    "aho-corasick",
+    "bloom-filter",
+    "phishing-protection",
+    "uzbekistan",
+    "scam-detector",
+    "chrome-extension",
+    "manifest-v3",
+    "shadow-dom"
+  ],
+  "author": "Kattabek Norbaev & Himoya Security Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

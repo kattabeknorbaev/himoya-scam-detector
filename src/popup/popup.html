@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="uz" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Himoya AI - Cyber Shield</title>
+  <link rel="stylesheet" href="popup.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="popup-wrapper">
+    <!-- Ambient Background Lighting Orbs -->
+    <div class="ambient-glow glow-top"></div>
+    <div class="ambient-glow glow-bottom"></div>
+
+    <div class="popup-container">
+      <!-- HEADER -->
+      <header class="header">
+        <div class="brand">
+          <div class="brand-shield-wrapper">
+            <!-- Dynamic Vector Shield Logo with Cyber Mesh -->
+            <svg class="brand-logo" width="34" height="34" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="shieldGrad" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#FF385C"/>
+                  <stop offset="50%" stop-color="#E11D48"/>
+                  <stop offset="100%" stop-color="#6366F1"/>
+                </linearGradient>
+                <filter id="shieldGlow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#FF385C" flood-opacity="0.45"/>
+                </filter>
+              </defs>
+              <path d="M16 2.5L27 6.5V16C27 22.8 22.3 28.5 16 30C9.7 28.5 5 22.8 5 16V6.5L16 2.5Z" fill="url(#shieldGrad)" filter="url(#shieldGlow)"/>
+              <path d="M16 4.2L25.2 7.6V16C25.2 21.8 21.2 26.8 16 28.2C10.8 26.8 6.8 21.8 6.8 16V7.6L16 4.2Z" stroke="rgba(255,255,255,0.4)" stroke-width="1.2"/>
+              <path d="M11 15.5L14.5 19L21.5 12" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div class="brand-pulse-ring"></div>
+          </div>
+
+          <div class="brand-info">
+            <div class="brand-title-row">
+              <span class="brand-title">Himoya</span>
+              <span class="cyber-badge">AI v5.4</span>
+            </div>
+            <span class="brand-subtitle">Real-time Scam Defense</span>
+          </div>
+        </div>
+
+        <div class="header-controls">
+          <!-- Language Segmented Pills -->
+          <div class="lang-pills" id="langPills">
+            <button type="button" class="lang-pill active" data-lang="uz">UZ</button>
+            <button type="button" class="lang-pill" data-lang="uz_cyr">ЎЗ</button>
+            <button type="button" class="lang-pill" data-lang="ru">RU</button>
+          </div>
+
+          <!-- Master Cyber Switch -->
+          <label class="cyber-switch" title="Himoyani yoqish yoki o'chirish">
+            <input type="checkbox" id="masterToggle" checked>
+            <span class="switch-track">
+              <span class="switch-thumb"></span>
+            </span>
+          </label>
+        </div>
+      </header>
+
+      <!-- NAVIGATION SEGMENT (Raycast / Apple Style Sliding Pill) -->
+      <nav class="nav-segment" id="navSegment">
+        <div class="nav-slider" id="navSlider"></div>
+        <button type="button" class="nav-btn active" data-tab="tab-shield" id="navShield">
+          <svg class="nav-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          <span class="nav-btn-text">Himoya</span>
+        </button>
+        <button type="button" class="nav-btn" data-tab="tab-checker" id="navChecker">
+          <svg class="nav-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m21 21-4.3-4.3"/>
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m11 8 1.5 3 3 1.5-3 1.5-1.5 3-1.5-3-3-1.5 3-1.5z"/>
+          </svg>
+          <span class="nav-btn-text">Tekshirish</span>
+        </button>
+        <button type="button" class="nav-btn" data-tab="tab-rules" id="navRules">
+          <svg class="nav-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
+            <path d="M6 6h10"/>
+            <path d="M6 10h10"/>
+          </svg>
+          <span class="nav-btn-text">Qoidalar</span>
+        </button>
+      </nav>
+
+      <!-- TAB 1: SHIELD DASHBOARD -->
+      <div class="tab-pane active" id="tab-shield">
+        <!-- Hero Radar Status Card -->
+        <div class="cyber-card hero-status-card" id="statusCard">
+          <div class="status-radar-cluster">
+            <div class="radar-outer-ring">
+              <div class="radar-sweep"></div>
+              <div class="radar-center-core" id="statusDot"></div>
+            </div>
+            <div class="status-text-group">
+              <div class="status-title-row">
+                <span class="status-heading" id="statusText">Himoya faol ishlamoqda</span>
+                <span class="live-pulse-badge">LIVE</span>
+              </div>
+              <div class="status-sub" id="threatSub">Sahifada xavf aniqlanmadi</div>
+            </div>
+          </div>
+          <div class="threat-counter-badge" id="threatCountBadge" title="Sahifada bloklangan tahdidlar">0</div>
+        </div>
+
+        <!-- Active Domain Shield Row -->
+        <div class="cyber-card domain-shield-card">
+          <div class="domain-meta">
+            <div class="domain-icon-box">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="2" y1="12" x2="22" y2="12"/>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              </svg>
+            </div>
+            <div class="domain-name-box">
+              <span class="domain-label">Hozirgi sayt:</span>
+              <span class="domain-name" id="siteDomain">...</span>
+            </div>
+          </div>
+          <button type="button" class="btn-domain-action" id="whitelistBtn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="m9 12 2 2 4-4"/>
+            </svg>
+            <span>Ishonchli</span>
+          </button>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="metrics-grid">
+          <div class="cyber-card metric-box">
+            <div class="metric-top-row">
+              <span class="metric-category-tag">BUGUN</span>
+              <div class="metric-icon-mini text-rose">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+              </div>
+            </div>
+            <span class="metric-val" id="statsToday">0</span>
+            <span class="metric-sub" id="statsTodayLabel">Bugun to'xtatildi</span>
+          </div>
+
+          <div class="cyber-card metric-box">
+            <div class="metric-top-row">
+              <span class="metric-category-tag">JAMI</span>
+              <div class="metric-icon-mini text-indigo">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                </svg>
+              </div>
+            </div>
+            <span class="metric-val" id="statsTotal">0</span>
+            <span class="metric-sub" id="statsTotalLabel">Jami to'xtatildi</span>
+          </div>
+        </div>
+
+        <!-- Security Configuration Card -->
+        <div class="cyber-card config-card">
+          <div class="config-header">
+            <span class="config-title" id="sensitivityLabel">Aniqlash sezgirligi:</span>
+            <span class="config-hint">AI tahlil darajasi</span>
+          </div>
+
+          <div class="segmented-control">
+            <label class="segment-opt">
+              <input type="radio" name="sensitivity" value="strict">
+              <span id="optStrict">Kuchli</span>
+            </label>
+            <label class="segment-opt">
+              <input type="radio" name="sensitivity" value="balanced" checked>
+              <span id="optBalanced">Standart</span>
+            </label>
+            <label class="segment-opt">
+              <input type="radio" name="sensitivity" value="relaxed">
+              <span id="optRelaxed">Yengil</span>
+            </label>
+          </div>
+
+          <div class="audio-toggle-row">
+            <div class="audio-label-group">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-rose">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+              </svg>
+              <span class="audio-text" id="audioLabel">Ovozli ogohlantirish</span>
+            </div>
+            <label class="cyber-switch mini">
+              <input type="checkbox" id="audioToggle">
+              <span class="switch-track">
+                <span class="switch-thumb"></span>
+              </span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: SMART MESSAGE SCANNER -->
+      <div class="tab-pane" id="tab-checker">
+        <div class="cyber-card scanner-card">
+          <div class="scanner-header">
+            <div class="scanner-title-row">
+              <span class="scanner-title" id="checkerTitle">Matnni tekshirish</span>
+              <span class="ai-shield-tag">Gemini + ML</span>
+            </div>
+            <span class="scanner-desc" id="checkerHint">Telegram, SMS yoki ijtimoiy tarmoq xabarini kiriting</span>
+          </div>
+
+          <!-- Quick Sample Chips -->
+          <div class="sample-chips-row">
+            <button type="button" class="sample-chip" data-sample="Siz 5 mln yutib oldingiz. Bu linkga bosing">
+              <span class="chip-dot dot-rose"></span>
+              <span>5 mln yutuq</span>
+            </button>
+            <button type="button" class="sample-chip" data-sample="Karta raqami va kelgan sms kodni yuboring, pulingizni qaytaramiz">
+              <span class="chip-dot dot-amber"></span>
+              <span>Karta / SMS</span>
+            </button>
+            <button type="button" class="sample-chip" data-sample="Jiyanim tanlovda qatnashyapti ovoz bering linkga kirib">
+              <span class="chip-dot dot-indigo"></span>
+              <span>Ovoz berish</span>
+            </button>
+            <button type="button" class="sample-chip" data-sample="Bu rasmda senmisan? fotolar.apk yuklab olib och">
+              <span class="chip-dot dot-rose"></span>
+              <span>Foto.apk</span>
+            </button>
+            <button type="button" class="sample-chip" data-sample="Uzum marketda tovarlarga layk bosib pul ishlash! Kuniga 300 000 so'm">
+              <span class="chip-dot dot-amber"></span>
+              <span>Uzum layk</span>
+            </button>
+            <button type="button" class="sample-chip" data-sample="Prezident qaroriga binoan bolalar uchun kompensatsiya tolanadi. Havolaga o'ting">
+              <span class="chip-dot dot-indigo"></span>
+              <span>Kompensatsiya</span>
+            </button>
+            <button type="button" class="sample-chip" data-sample="Kartangiz ma'lumotlari bazadan sizib chiqdi! Mablag'ni xavfsiz tranzit hisobga o'tkazing">
+              <span class="chip-dot dot-rose"></span>
+              <span>Baza sizishi</span>
+            </button>
+          </div>
+
+          <!-- Textarea Input Area -->
+          <div class="textarea-shell">
+            <textarea id="checkerInput" class="cyber-textarea" rows="3" placeholder="Shubhali xabarni shu yerga qo'ying..."></textarea>
+            <button type="button" class="btn-clear-ghost" id="clearInputBtn" title="Tozalash" style="display: none;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+
+          <div class="scanner-meta-row">
+            <span class="char-counter" id="charCounter">0 belgi</span>
+            <span class="shortcut-pill" id="shortcutHint">Ctrl+Enter ↵</span>
+          </div>
+
+          <!-- Scan Action Button -->
+          <button type="button" class="btn-cyber-primary" id="checkMsgBtn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+            </svg>
+            <span id="checkBtnText">Xabarni tekshirish</span>
+          </button>
+
+          <!-- Result Container -->
+          <div class="result-wrapper" id="checkerResult" style="display: none;">
+            <div class="result-card" id="resultBox">
+              <!-- Dynamically populated -->
+            </div>
+            <button type="button" class="btn-copy-diag" id="copyDiagBtn" style="display: none;">
+              <span id="copyIcon">📋</span>
+              <span id="copyText">Natijani nusxalash</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: GOLDEN RULES & TEST SIMULATOR -->
+      <div class="tab-pane" id="tab-rules">
+        <div class="rules-stack" id="rulesList">
+          <!-- Rendered via i18n -->
+        </div>
+
+        <div class="simulator-section">
+          <div class="simulator-header">
+            <span class="sim-title">Himoya Sandbox Simulator</span>
+            <span class="sim-badge">Test rejimi</span>
+          </div>
+          <button type="button" class="btn-cyber-ghost" id="demoBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <span>Xavfli postni simulyatsiya qilish</span>
+          </button>
+
+          <div id="demoContainer" class="demo-wrapper" style="display: none;">
+            <div class="telegram-bubble-card" id="demoPost">
+              <div class="telegram-post-head">
+                <span class="telegram-avatar">TG</span>
+                <div>
+                  <div class="telegram-author">Rasmiy Sovg'alar Bot</div>
+                  <div class="telegram-time">bugun 14:20</div>
+                </div>
+              </div>
+              <div class="telegram-post-body">
+                Tabriklaymiz! Siz <strong>5,000,000 so'm</strong> yutib oldingiz! Pulni yechib olish uchun plastik karta raqami va sms kodni yuboring!
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <footer class="footer">
+        <a href="https://github.com/kattabeknorbaev/himoya-scam-detector" target="_blank" class="footer-action" id="reportLink">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          </svg>
+          <span>Yangi firibgarlikni xabar qilish</span>
+        </a>
+        <div class="footer-bottom">
+          <span class="footer-tagline" id="footerCopy">O'zbek xalqi xavfsizligi uchun</span>
+          <span class="footer-sep">•</span>
+          <span class="footer-secure">100% Client-Side Privacy</span>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <script src="../../i18n.js"></script>
+  <script src="../../ml_classifier.js"></script>
+  <script src="../../heuristics.js"></script>
+  <script src="../../ai_provider.js"></script>
+  <script src="../../engine.js"></script>
+  <script src="../utils/storage.js"></script>
+  <script src="../engine/normalizer.js"></script>
+  <script src="../engine/ahoCorasick.js"></script>
+  <script src="../engine/bloomFilter.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

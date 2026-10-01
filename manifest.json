@@ -1,17 +1,22 @@
 {
   "manifest_version": 3,
   "name": "Himoya: AI Scam & Phishing Detector",
-  "version": "5.3.0",
-  "description": "Protects Uzbek speakers from financial fraud, fake giveaways, and phishing in real time using local ML and behavioral analysis.",
+  "version": "5.4.0",
+  "description": "Ivy-League caliber client-side security engine protecting Central Asian users from card drainers, OTP phishing, and malicious APKs.",
   "permissions": [
     "storage",
-    "activeTab"
+    "alarms"
+  ],
+  "host_permissions": [
+    "https://web.telegram.org/*",
+    "https://*.facebook.com/*",
+    "https://*.instagram.com/*"
   ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "src/background/serviceWorker.js"
   },
   "action": {
-    "default_popup": "popup/popup.html",
+    "default_popup": "src/popup/popup.html",
     "default_title": "Himoya AI",
     "default_icon": {
       "16": "icon16.png",
@@ -22,20 +27,32 @@
   "content_scripts": [
     {
       "matches": [
-        "<all_urls>"
+        "https://web.telegram.org/*",
+        "https://*.facebook.com/*",
+        "https://*.instagram.com/*"
       ],
       "js": [
-        "i18n.js",
-        "ml_classifier.js",
-        "heuristics.js",
-        "ai_provider.js",
-        "engine.js",
-        "content.js"
+        "src/utils/storage.js",
+        "src/engine/normalizer.js",
+        "src/engine/ahoCorasick.js",
+        "src/engine/bloomFilter.js",
+        "src/content/shadowUI.js",
+        "src/content/contentScript.js"
       ],
-      "css": [
-        "styles.css"
+      "run_at": "document_idle",
+      "world": "ISOLATED"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "src/engine/rules.json"
       ],
-      "run_at": "document_idle"
+      "matches": [
+        "https://web.telegram.org/*",
+        "https://*.facebook.com/*",
+        "https://*.instagram.com/*"
+      ]
     }
   ],
   "icons": {

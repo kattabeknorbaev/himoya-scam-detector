@@ -1,7 +1,7 @@
-# Himoya Extension Packaging & Validation Script v4.5.0
-# Generates a clean .zip package ready for Chrome Web Store Developer Console upload.
+# Himoya Extension Packaging & Validation Script v5.4.0
+# Generates an enterprise-grade .zip package ready for Chrome Web Store Developer Console upload.
 
-Write-Host "`n=== Himoya Extension Build & Packaging Pipeline ===`n" -ForegroundColor Cyan
+Write-Host "`n=== Himoya Extension Build & Packaging Pipeline (v5.4.0) ===`n" -ForegroundColor Cyan
 
 $root = $PSScriptRoot
 $tempDist = Join-Path $root "dist_tmp"
@@ -26,12 +26,19 @@ try {
 
 # 2. Run Engine unit tests via Node.js
 Write-Host "Running detection engine unit tests..." -ForegroundColor Yellow
-$nodeRun = & node (Join-Path $root "test\test_engine.js")
+$test1 = & node (Join-Path $root "tests\ahoCorasick.test.js")
 if ($LASTEXITCODE -ne 0) {
-    Write-Error "Engine unit tests failed! Aborting packaging."
+    Write-Error "Aho-Corasick unit tests failed! Aborting packaging."
     exit 1
 }
-Write-Host $nodeRun -ForegroundColor Green
+Write-Host $test1 -ForegroundColor Green
+
+$test2 = & node (Join-Path $root "tests\normalizer.test.js")
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Normalizer unit tests failed! Aborting packaging."
+    exit 1
+}
+Write-Host $test2 -ForegroundColor Green
 
 # 3. Clean previous builds
 if (Test-Path $zipPath) {
@@ -42,26 +49,17 @@ if (Test-Path $tempDist) {
 }
 
 New-Item -ItemType Directory -Path $tempDist | Out-Null
-New-Item -ItemType Directory -Path (Join-Path $tempDist "popup") | Out-Null
 
-# 4. Copy required extension files
-$coreFiles = @(
+# 4. Copy required extension files into dist_tmp
+$rootFiles = @(
     "manifest.json",
-    "background.js",
-    "i18n.js",
-    "ml_classifier.js",
-    "heuristics.js",
-    "ai_provider.js",
-    "engine.js",
-    "content.js",
-    "styles.css",
     "icon16.png",
     "icon48.png",
     "icon128.png",
     "LICENSE"
 )
 
-foreach ($f in $coreFiles) {
+foreach ($f in $rootFiles) {
     $src = Join-Path $root $f
     if (Test-Path $src) {
         Copy-Item $src -Destination $tempDist
@@ -70,13 +68,14 @@ foreach ($f in $coreFiles) {
     }
 }
 
-# Copy popup files
-$popupFiles = @("popup.html", "popup.css", "popup.js")
-foreach ($pf in $popupFiles) {
-    $src = Join-Path $root "popup\$pf"
-    if (Test-Path $src) {
-        Copy-Item $src -Destination (Join-Path $tempDist "popup")
-    }
+# Copy src directory recursively
+$srcDir = Join-Path $root "src"
+if (Test-Path $srcDir) {
+    Copy-Item -Path $srcDir -Destination $tempDist -Recurse
+    Write-Host "[OK] Copied src/ directory tree" -ForegroundColor Green
+} else {
+    Write-Error "src/ directory not found! Aborting packaging."
+    exit 1
 }
 
 # 5. Compress to ZIP
