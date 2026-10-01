@@ -18,6 +18,7 @@ Himoya is an on-device security extension architected strictly under the **Princ
 | :--- | :--- |
 | `"storage"` | **Required for client-side persistence without external servers.**<br>• Persists user security configuration (extension toggle state, notification preferences).<br>• Stores user-defined whitelisted domains to prevent repeated warnings.<br>• Retains aggregate threat telemetry counters (e.g., total threats blocked today, threat category tallies) strictly on-device for display within the user popup dashboard (`src/popup/`).<br>• **Zero remote synchronization:** All storage operations use `chrome.storage.local`. |
 | `"alarms"` | **Required for service worker lifecycle maintenance.**<br>• In Manifest V3, background service workers are ephemeral and terminate when idle.<br>• The `"alarms"` API schedules daily counter rollovers and cached rule pack validation pulses without keeping persistent wake-locks or polling loops active, maximizing browser power efficiency. |
+| `"activeTab"` | **Required for active tab domain resolution and security posture display.**<br>• Granted temporarily only when the user explicitly clicks the extension popup action.<br>• Enables the popup to identify the active website's domain (`tab.url`), display the current security status in the shield header, and allow the user to whitelist trusted sites.<br>• Automatically revoked when navigating away or closing the popup, with zero persistent background access. |
 
 ---
 

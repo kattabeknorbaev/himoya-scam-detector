@@ -1,6 +1,6 @@
 # Himoya: AI Scam & Phishing Detector 🛡️
 
-**Enterprise-Grade, Ivy-League-Caliber Client-Side Security Engine for Central Asia**
+**Enterprise-Grade Client-Side Security Engine for Central Asia**
 
 [![Chrome Web Store Manifest V3](https://img.shields.io/badge/Manifest-V3-blue.svg)](https://developer.chrome.com/docs/extensions/mv3/intro/)
 [![Version](https://img.shields.io/badge/Version-5.4.0-rose.svg)](https://github.com/kattabeknorbaev/himoya-scam-detector/releases)

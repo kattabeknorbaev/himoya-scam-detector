@@ -237,14 +237,16 @@
 
   // Listen for Runtime Commands from Popup
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.type === 'GET_PAGE_THREATS') {
-      sendResponse({ threatCount: pageThreatCount, host: currentHost });
+    if (request.type === 'GET_PAGE_THREATS' || request.type === 'HIMOYA_GET_PAGE_STATUS') {
+      sendResponse({ threatCount: pageThreatCount, count: pageThreatCount, host: currentHost });
     } else if (request.type === 'TRIGGER_MANUAL_SCAN') {
       scannedNodes.clear && (scannedNodes = new WeakSet());
       enqueueElements(document.body);
       sendResponse({ status: 'SCAN_STARTED' });
-    } else if (request.type === 'CONFIG_CHANGED') {
-      engineActive = request.settings.engineEnabled;
+    } else if (request.type === 'CONFIG_CHANGED' || request.type === 'HIMOYA_SETTINGS_CHANGED') {
+      if (request.settings && request.settings.engineEnabled !== undefined) {
+        engineActive = request.settings.engineEnabled;
+      }
       sendResponse({ status: 'OK' });
     }
     return true;

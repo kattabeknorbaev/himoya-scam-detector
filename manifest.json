@@ -2,10 +2,11 @@
   "manifest_version": 3,
   "name": "Himoya: AI Scam & Phishing Detector",
   "version": "5.4.0",
-  "description": "Ivy-League caliber client-side security engine protecting Central Asian users from card drainers, OTP phishing, and malicious APKs.",
+  "description": "Enterprise client-side security engine protecting Central Asian users from card drainers, OTP phishing, and malicious APKs.",
   "permissions": [
     "storage",
-    "alarms"
+    "alarms",
+    "activeTab"
   ],
   "host_permissions": [
     "https://web.telegram.org/*",

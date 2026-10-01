@@ -176,30 +176,38 @@ document.addEventListener('DOMContentLoaded', async () => {
               currentDomain = url.hostname.toLowerCase();
               if (siteDomainEl) siteDomainEl.textContent = currentDomain;
               if (whitelistBtn) whitelistBtn.style.display = 'inline-flex';
-            } else if (rawUrl.startsWith('chrome://newtab') || rawUrl.startsWith('chrome-search://') || rawUrl.startsWith('about:blank')) {
+            } else if (rawUrl.startsWith('chrome://newtab') || rawUrl.startsWith('chrome-search://') || rawUrl.startsWith('about:blank') || rawUrl.startsWith('edge://newtab')) {
               currentDomain = '';
-              if (siteDomainEl) siteDomainEl.textContent = 'Yangi oyna (New Tab)';
+              if (siteDomainEl) siteDomainEl.textContent = 'Yangi sahifa';
+              if (whitelistBtn) whitelistBtn.style.display = 'none';
+            } else if (rawUrl.startsWith('chrome://') || rawUrl.startsWith('edge://') || rawUrl.startsWith('brave://') || rawUrl.startsWith('about:')) {
+              currentDomain = '';
+              if (siteDomainEl) siteDomainEl.textContent = 'Brauzer sahifasi';
               if (whitelistBtn) whitelistBtn.style.display = 'none';
             } else {
               currentDomain = '';
-              if (siteDomainEl) siteDomainEl.textContent = 'Brauzer sahifasi';
+              if (siteDomainEl) siteDomainEl.textContent = tab.title ? tab.title.slice(0, 24) : 'Faol sahifa';
               if (whitelistBtn) whitelistBtn.style.display = 'none';
             }
           } catch (e) {
             currentDomain = '';
-            if (siteDomainEl) siteDomainEl.textContent = 'Yangi oyna';
+            if (siteDomainEl) siteDomainEl.textContent = tab.title ? tab.title.slice(0, 24) : 'Faol sahifa';
             if (whitelistBtn) whitelistBtn.style.display = 'none';
           }
+        } else if (tab.title && !tab.title.toLowerCase().includes('new tab') && !tab.title.toLowerCase().includes('yangi oyna') && !tab.title.toLowerCase().includes('yangi sahifa')) {
+          currentDomain = '';
+          if (siteDomainEl) siteDomainEl.textContent = tab.title.slice(0, 24);
+          if (whitelistBtn) whitelistBtn.style.display = 'none';
         } else {
           currentDomain = '';
-          if (siteDomainEl) siteDomainEl.textContent = 'Yangi oyna (New Tab)';
+          if (siteDomainEl) siteDomainEl.textContent = 'Faol sahifa';
           if (whitelistBtn) whitelistBtn.style.display = 'none';
         }
       }
     }
   } catch (err) {
     currentDomain = '';
-    if (siteDomainEl) siteDomainEl.textContent = 'Brauzer sahifasi';
+    if (siteDomainEl) siteDomainEl.textContent = 'Faol sahifa';
     if (whitelistBtn) whitelistBtn.style.display = 'none';
   }
 
@@ -244,14 +252,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     applyLanguage('uz');
   }
 
-  // 3. Query active tab for page threat count
+  // 3. Query active tab for page threat count and verify host
   if (activeTabId && typeof chrome !== 'undefined' && chrome.tabs && chrome.tabs.sendMessage) {
     chrome.tabs.sendMessage(activeTabId, { type: 'HIMOYA_GET_PAGE_STATUS' }, (res) => {
       if (chrome.runtime.lastError || !res) {
         setThreatDisplay(0);
         return;
       }
-      setThreatDisplay(res.count || 0);
+      if (res.host && (!currentDomain || currentDomain === '')) {
+        currentDomain = res.host.toLowerCase();
+        if (siteDomainEl) siteDomainEl.textContent = currentDomain;
+        if (whitelistBtn) whitelistBtn.style.display = 'inline-flex';
+        if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+          chrome.storage.local.get(['himoya_whitelist'], (data) => {
+            const whitelist = Array.isArray(data.himoya_whitelist) ? data.himoya_whitelist : [];
+            updateWhitelistButtonState(whitelist.includes(currentDomain));
+          });
+        }
+      }
+      setThreatDisplay(res.count ?? res.threatCount ?? 0);
     });
   }
 
