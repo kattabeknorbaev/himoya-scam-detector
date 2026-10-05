@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Himoya: AI Scam & Phishing Detector",
-  "version": "5.4.0",
+  "version": "5.4.1",
   "description": "Enterprise client-side security engine protecting Central Asian users from card drainers, OTP phishing, and malicious APKs.",
   "permissions": [
     "storage",

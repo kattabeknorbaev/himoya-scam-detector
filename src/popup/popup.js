@@ -58,6 +58,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   const demoContainer = document.getElementById('demoContainer');
   const demoPost = document.getElementById('demoPost');
 
+  // Crowdsourced Intelligence Tab Elements
+  const navReport = document.getElementById('navReport');
+  const reportCardTitle = document.getElementById('reportCardTitle');
+  const reportCardSub = document.getElementById('reportCardSub');
+  const reportTypeHeader = document.getElementById('reportTypeHeader');
+  const reportCategory = document.getElementById('reportCategory');
+  const reportContentHeader = document.getElementById('reportContentHeader');
+  const reportInput = document.getElementById('reportInput');
+  const btnSubmitReport = document.getElementById('btnSubmitReport');
+  const btnSubmitReportText = document.getElementById('btnSubmitReportText');
+  const btnGithubIssue = document.getElementById('btnGithubIssue');
+  const reportStatusBanner = document.getElementById('reportStatusBanner');
+  const reportStatusText = document.getElementById('reportStatusText');
+  const reportedCount = document.getElementById('reportedCount');
+  const reportedCountLabel = document.getElementById('reportedCountLabel');
+
   let currentDomain = '';
   let activeTabId = null;
   let currentLang = 'uz';
@@ -143,6 +159,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       `).join('');
     }
+
+    // Crowdsourced Intelligence Strings
+    const reportNavLabel = navReport?.querySelector('.nav-btn-text');
+    if (reportNavLabel) reportNavLabel.textContent = str.reportTab || 'Xabar';
+    if (reportCardTitle && str.reportModalTitle) reportCardTitle.textContent = str.reportModalTitle;
+    if (reportTypeHeader && str.reportTypeLabel) reportTypeHeader.textContent = str.reportTypeLabel;
+    if (reportContentHeader && str.reportContentLabel) reportContentHeader.textContent = str.reportContentLabel;
+    if (btnSubmitReportText && str.reportSubmitBtn) btnSubmitReportText.textContent = str.reportSubmitBtn;
+    if (reportStatusText && str.reportSuccess) reportStatusText.textContent = str.reportSuccess;
   }
 
   function escapeHtml(str) {
@@ -496,80 +521,151 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const str = (typeof HIMOYA_I18N !== 'undefined' && HIMOYA_I18N[currentLang]) ? HIMOYA_I18N[currentLang] : {};
 
+    let res = null;
     if (typeof analyzeContent === 'function') {
-      const res = analyzeContent(text, 4.0, currentLang);
-      checkerResult.style.display = 'block';
-
-      if (res.isScam) {
-        resultBox.className = 'result-card scam';
-        const tagsHtml = res.categories.map(c => `<span class="res-tag">${escapeHtml(c.name)}</span>`).join('');
-        const matchedKw = res.matchedKeywords.length > 0 
-          ? `<div class="res-advice" style="margin-top:6px;font-size:11px;color:#fca5a5;"><strong>Aniqlangan belgilar:</strong> ${res.matchedKeywords.map(k => `<code style="background:rgba(255,255,255,0.1);padding:1px 4px;border-radius:3px;">${escapeHtml(k)}</code>`).join(' ')}</div>`
-          : '';
-
-        const mlBadge = res.mlProbability 
-          ? `
-            <div class="ml-meter-box">
-              <div class="ml-meter-label">
-                <span>🧠 AI / ML Modeli:</span>
-                <strong>${res.mlProbability}% Firibgarlik ehtimoli</strong>
-              </div>
-              <div class="ml-meter-bar">
-                <div class="ml-meter-fill" style="width: ${res.mlProbability}%"></div>
-              </div>
-            </div>
-          `
-          : '';
-
-        let heuristicNotes = '';
-        const notes = [];
-        if (res.heuristics) {
-          if (res.heuristics.baitProximity) notes.push('🎣 Yutuq va harakat bevosita bog\'langan (Bait-to-Action)');
-          if (res.heuristics.urgencyIndex >= 0.4) notes.push('⏱️ Sun\'iy psixologik shoshiltirish');
-          if (res.heuristics.urlRisk) notes.push('🔗 Shubhali yoki yashirin havola formati');
-          if (notes.length > 0) {
-            heuristicNotes = `<div class="heuristic-box"><strong>Xulq-atvor tahlili:</strong><br>${notes.map(n => `• ${escapeHtml(n)}`).join('<br>')}</div>`;
-          }
-        }
-
-        resultBox.innerHTML = `
-          <div class="res-header-row">
-            <span class="res-title">${escapeHtml(str.checkerScam || '🚨 XAVF: FIRIBGARLIK ANIQLANDI')}</span>
-            <span class="res-badge high">${res.riskLevel}</span>
-          </div>
-          ${mlBadge}
-          <div class="res-tags">
-            ${tagsHtml}
-          </div>
-          ${matchedKw}
-          ${heuristicNotes}
-          <div class="res-advice-warning">
-            ⚠️ Hech qachon bu havolani ochmang va shaxsiy ma'lumotlaringizni kiritmang!
-          </div>
-        `;
-
-        lastReportText = `[Himoya AI Xavfsizlik Hisoboti]\nHolat: FIRIBGARLIK (${res.riskLevel})\nAI Ehtimoli: ${res.mlProbability}%\nKategoriyalar: ${res.categories.map(c => c.name).join(', ')}\nAniqlangan belgilar: ${res.matchedKeywords.join(', ')}\nMatn: "${text}"`;
-        if (copyDiagBtn) copyDiagBtn.style.display = 'flex';
-      } else {
-        resultBox.className = 'result-card safe';
-        const mlNote = res.mlProbability 
-          ? `<div style="font-size:11px;color:#a7f3d0;margin-top:6px;">🧠 AI/ML Modeli: ${res.mlProbability}% ehtimol (Xavfsiz)</div>`
-          : '';
-        resultBox.innerHTML = `
-          <div class="res-header-row">
-            <span class="res-title" style="color: #6ee7b7;">${escapeHtml(str.checkerSafe || '🛡️ SHUBHALI BELGILAR TOPILMADI')}</span>
-            <span class="res-badge safe">XAVFSIZ</span>
-          </div>
-          <div class="res-advice" style="color: #d1fae5;font-size:11.5px;">
-            ${escapeHtml(str.checkerSafeDesc || 'Xabarda moliyaviy firibgarlik yoki fishing alomatlari aniqlanmadi.')}
-          </div>
-          ${mlNote}
-        `;
-
-        lastReportText = `[Himoya AI Xavfsizlik Hisoboti]\nHolat: XAVFSIZ\nAI Ehtimoli: ${res.mlProbability}%\nMatn: "${text}"`;
-        if (copyDiagBtn) copyDiagBtn.style.display = 'flex';
-      }
+      res = analyzeContent(text, 4.0, currentLang);
+    } else if (typeof HimoyaAnalyzer !== 'undefined' && typeof HimoyaAnalyzer.analyze === 'function') {
+      res = HimoyaAnalyzer.analyze(text, currentLang);
+    } else {
+      res = {
+        isScam: false,
+        riskLevel: 'SAFE',
+        mlProbability: 2,
+        categories: [],
+        matchedKeywords: [],
+        heuristics: {},
+        advice: 'Tahlil yakunlandi.'
+      };
     }
+
+    checkerResult.style.display = 'block';
+
+    if (res.isScam) {
+      resultBox.className = 'result-card scam';
+      const tagsHtml = res.categories.map(c => `<span class="res-tag">${escapeHtml(c.name)}</span>`).join('');
+      const matchedKw = res.matchedKeywords.length > 0 
+        ? `<div class="res-advice" style="margin-top:6px;font-size:11px;color:#fca5a5;"><strong>Aniqlangan belgilar:</strong> ${res.matchedKeywords.map(k => `<code style="background:rgba(255,255,255,0.1);padding:1px 4px;border-radius:3px;">${escapeHtml(k)}</code>`).join(' ')}</div>`
+        : '';
+
+      const mlBadge = res.mlProbability 
+        ? `
+          <div class="ml-meter-box">
+            <div class="ml-meter-label">
+              <span>🧠 AI / ML Modeli:</span>
+              <strong>${res.mlProbability}% Firibgarlik ehtimoli</strong>
+            </div>
+            <div class="ml-meter-bar">
+              <div class="ml-meter-fill" style="width: ${res.mlProbability}%"></div>
+            </div>
+          </div>
+        `
+        : '';
+
+      let heuristicNotes = '';
+      const notes = [];
+      if (res.heuristics) {
+        if (res.heuristics.baitProximity) notes.push('🎣 Yutuq va harakat bevosita bog\'langan (Bait-to-Action)');
+        if (res.heuristics.urgencyIndex >= 0.4) notes.push('⏱️ Sun\'iy psixologik shoshiltirish');
+        if (res.heuristics.urlRisk) notes.push('🔗 Shubhali yoki yashirin havola formati');
+        if (res.heuristics.apkDetected) notes.push('📱 Xavfli .APK fayli biriktirilgan');
+        if (notes.length > 0) {
+          heuristicNotes = `<div class="heuristic-box"><strong>Xulq-atvor tahlili:</strong><br>${notes.map(n => `• ${escapeHtml(n)}`).join('<br>')}</div>`;
+        }
+      }
+
+      resultBox.innerHTML = `
+        <div class="res-header-row">
+          <span class="res-title">${escapeHtml(str.checkerScam || '🚨 XAVF: FIRIBGARLIK ANIQLANDI')}</span>
+          <span class="res-badge high">${res.riskLevel}</span>
+        </div>
+        ${mlBadge}
+        <div class="res-tags">
+          ${tagsHtml}
+        </div>
+        ${matchedKw}
+        ${heuristicNotes}
+        <div class="res-advice-warning">
+          ⚠️ ${escapeHtml(res.advice || 'Hech qachon bu havolani ochmang va shaxsiy ma\'lumotlaringizni kiritmang!')}
+        </div>
+      `;
+
+      lastReportText = `[Himoya AI Xavfsizlik Hisoboti]\nHolat: FIRIBGARLIK (${res.riskLevel})\nAI Ehtimoli: ${res.mlProbability}%\nKategoriyalar: ${res.categories.map(c => c.name).join(', ')}\nAniqlangan belgilar: ${res.matchedKeywords.join(', ')}\nMatn: "${text}"`;
+      if (copyDiagBtn) copyDiagBtn.style.display = 'flex';
+    } else {
+      resultBox.className = 'result-card safe';
+      const mlNote = res.mlProbability 
+        ? `<div style="font-size:11px;color:#a7f3d0;margin-top:6px;">🧠 AI/ML Modeli: ${res.mlProbability}% ehtimol (Xavfsiz)</div>`
+        : '';
+      resultBox.innerHTML = `
+        <div class="res-header-row">
+          <span class="res-title" style="color: #6ee7b7;">${escapeHtml(str.checkerSafe || '🛡️ SHUBHALI BELGILAR TOPILMADI')}</span>
+          <span class="res-badge safe">XAVFSIZ</span>
+        </div>
+        <div class="res-advice" style="color: #d1fae5;font-size:11.5px;">
+          ${escapeHtml(str.checkerSafeDesc || 'Xabarda moliyaviy firibgarlik yoki fishing alomatlari aniqlanmadi.')}
+        </div>
+        ${mlNote}
+      `;
+
+      lastReportText = `[Himoya AI Xavfsizlik Hisoboti]\nHolat: XAVFSIZ\nAI Ehtimoli: ${res.mlProbability}%\nMatn: "${text}"`;
+      if (copyDiagBtn) copyDiagBtn.style.display = 'flex';
+    }
+  }
+
+  // Event: Crowdsourced Intelligence Submit
+  if (btnSubmitReport && reportInput) {
+    btnSubmitReport.addEventListener('click', (e) => {
+      e.preventDefault();
+      const text = (reportInput.value || '').trim();
+      if (!text) {
+        reportInput.style.borderColor = '#f43f5e';
+        reportInput.focus();
+        setTimeout(() => { reportInput.style.borderColor = ''; }, 1500);
+        return;
+      }
+
+      const cat = reportCategory ? reportCategory.value : 'OTHER';
+      const newReport = {
+        category: cat,
+        text: text,
+        timestamp: new Date().toISOString()
+      };
+
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.get(['himoya_user_reports'], (data) => {
+          const list = Array.isArray(data.himoya_user_reports) ? data.himoya_user_reports : [];
+          list.push(newReport);
+          chrome.storage.local.set({ himoya_user_reports: list }, () => {
+            if (reportedCount) reportedCount.textContent = list.length.toString();
+          });
+        });
+      }
+
+      // Update pre-filled GitHub issue link
+      if (btnGithubIssue) {
+        const title = encodeURIComponent(`[Scam Report] ${cat}: ${text.slice(0, 45)}...`);
+        const body = encodeURIComponent(`### Crowdsourced Threat Intelligence Report\n\n**Category:** ${cat}\n**Timestamp:** ${new Date().toUTCString()}\n\n**Suspicious Content:**\n\`\`\`\n${text}\n\`\`\`\n\n*Submitted via Himoya Scam Detector Extension*`);
+        btnGithubIssue.href = `https://github.com/kattabeknorbaev/himoya-scam-detector/issues/new?title=${title}&body=${body}`;
+      }
+
+      if (reportStatusBanner) {
+        reportStatusBanner.style.display = 'block';
+        setTimeout(() => {
+          reportStatusBanner.style.display = 'none';
+        }, 4000);
+      }
+
+      reportInput.value = '';
+    });
+  }
+
+  // Load initial crowdsourced count
+  if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+    chrome.storage.local.get(['himoya_user_reports'], (data) => {
+      const list = Array.isArray(data.himoya_user_reports) ? data.himoya_user_reports : [];
+      if (reportedCount) reportedCount.textContent = list.length.toString();
+    });
+  }
   }
 
   // Event: Simulator Demo Button

@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Himoya AI - 30s Telegram Video Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #0b0f19;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Screen Canvas 16:9 for High Quality Screen Recording (1280x720) */
+    .screen-stage {
+      width: 1080px;
+      height: 640px;
+      background: #17212b;
+      border-radius: 16px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Telegram Web Top Bar */
+    .tg-topbar {
+      height: 52px;
+      background: #0e1621;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 10;
+    }
+    .tg-topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .tg-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f43f5e, #fb7185);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .tg-chat-title {
+      font-weight: 700;
+      font-size: 14.5px;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tg-chat-status {
+      font-size: 12px;
+      color: #6c7883;
+    }
+
+    /* Browser Extension Bar Simulation */
+    .tg-topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .ext-badge {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #34d399;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .ext-badge.alert {
+      background: rgba(244, 63, 94, 0.2);
+      border-color: rgba(244, 63, 94, 0.5);
+      color: #f43f5e;
+      animation: pulseAlert 0.8s infinite alternate;
+    }
+    @keyframes pulseAlert {
+      from { box-shadow: 0 0 4px rgba(244, 63, 94, 0.3); }
+      to { box-shadow: 0 0 16px rgba(244, 63, 94, 0.7); }
+    }
+    .ext-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    /* Chat Area */
+    .tg-chat-body {
+      flex: 1;
+      padding: 24px 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: radial-gradient(circle at 50% 50%, #1e2c3a 0%, #0e1621 100%);
+      position: relative;
+    }
+
+    .msg-row {
+      display: flex;
+      flex-direction: column;
+      max-width: 620px;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .msg-row.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .msg-bubble {
+      background: #182533;
+      border-radius: 12px 12px 12px 2px;
+      padding: 12px 16px;
+      color: #e4ecf2;
+      font-size: 14px;
+      line-height: 1.5;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      position: relative;
+      transition: filter 0.4s ease, opacity 0.4s ease;
+    }
+    .msg-bubble.blurred {
+      filter: blur(8px);
+      opacity: 0.3;
+      pointer-events: none;
+    }
+    .msg-bubble a {
+      color: #38bdf8;
+      text-decoration: underline;
+    }
+
+    /* Himoya Injected Shadow DOM Alert */
+    .himoya-alert-card {
+      margin-top: 10px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1.5px solid #f43f5e;
+      border-radius: 12px;
+      padding: 14px 18px;
+      box-shadow: 0 10px 30px rgba(244, 63, 94, 0.25);
+      opacity: 0;
+      transform: scale(0.96) translateY(-8px);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: none;
+    }
+    .himoya-alert-card.show {
+      display: block;
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+    .alert-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .alert-badge {
+      background: #f43f5e;
+      color: #ffffff;
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+    .alert-title {
+      font-weight: 700;
+      color: #ffffff;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .alert-tags {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .alert-tag {
+      background: rgba(244, 63, 94, 0.15);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      color: #fca5a5;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .alert-body {
+      font-size: 12.5px;
+      color: #cbd5e1;
+      line-height: 1.4;
+      margin-bottom: 12px;
+    }
+    .alert-btn {
+      background: linear-gradient(135deg, #ff385c, #e11d48);
+      color: #fff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Interactive Overlay Explanations */
+    .cinema-caption {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(10, 15, 29, 0.92);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      padding: 10px 24px;
+      border-radius: 30px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #38bdf8;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      z-index: 50;
+      pointer-events: none;
+      white-space: nowrap;
+      transition: all 0.3s;
+    }
+
+    /* Video Controller Bar */
+    .controls-bar {
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .ctrl-btn {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #f8fafc;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+    .ctrl-btn:hover {
+      background: #334155;
+    }
+    .time-tracker {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Screen Recording Stage (1080x640) -->
+  <div class="screen-stage" id="stage">
+    <!-- Topbar -->
+    <div class="tg-topbar">
+      <div class="tg-topbar-left">
+        <div class="tg-avatar">TG</div>
+        <div>
+          <div class="tg-chat-title">
+            <span>Rasmiy Sovg'alar va Kompensatsiya Bot</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#38bdf8"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+          </div>
+          <div class="tg-chat-status">bot • Telegram Web</div>
+        </div>
+      </div>
+      <div class="tg-topbar-right">
+        <div class="ext-badge" id="extBadge">
+          <span class="ext-dot"></span>
+          <span id="extBadgeText">Himoya AI: Faol</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Telegram Chat Body -->
+    <div class="tg-chat-body">
+      <!-- Benign Intro Message -->
+      <div class="msg-row" id="msg1">
+        <div class="msg-bubble">
+          Assalomu alaykum! Sizga davlat ijtimoiy dasturi doirasida xabar yuborilmoqda.
+        </div>
+      </div>
+
+      <!-- Attack Message (Card Draining + OTP Phishing) -->
+      <div class="msg-row" id="msg2">
+        <div class="msg-bubble" id="scamBubble">
+          Hurmatli mijoz! Plastik kartangizdan <strong>1,450,000 so'm</strong> yechildi.<br>
+          Agar bu siz bo'lmasangiz, bekor qilish va pulni qaytarish uchun 16-talik karta raqami va 5-xonali <strong>SMS kodni</strong> kiriting:<br>
+          👉 <a href="#">https://uzcard-himoya-xavfsiz.top/bekor-qilish</a>
+        </div>
+
+        <!-- Himoya Injected Closed Shadow DOM Alert -->
+        <div class="himoya-alert-card" id="himoyaCard">
+          <div class="alert-header">
+            <div class="alert-title">
+              <span>🛡️ HIMOYA: XAVFSIZLIK OGOHLANTIRISHI</span>
+            </div>
+            <span class="alert-badge">CRITICAL RISK</span>
+          </div>
+          <div class="alert-tags">
+            <span class="alert-tag">💳 CARD_DRAINER</span>
+            <span class="alert-tag">🔑 OTP_THEFT</span>
+            <span class="alert-tag">🌐 PHISHING_DOMAIN</span>
+          </div>
+          <div class="alert-body">
+            ⚠️ <strong>DIQQAT!</strong> Ushbu xabar orqali firibgarlar plastik kartangizdagi barcha mablag'larni o'g'irlashga urinmoqda. Bank xodimlari hech qachon 5-xonali SMS kodni so'ramaydi!
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="alert-btn" id="btnReveal">👁️ Xavfni tushundim (Ko'rish)</button>
+            <button class="alert-btn" style="background:#334155;" id="btnWhite">🛡️ Oq ro'yxatga qo'shish</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cinematic Subtitle Caption -->
+    <div class="cinema-caption" id="caption">
+      ▶️ Tayyor: "Videoni boshlash" tugmasini bosing
+    </div>
+  </div>
+
+  <!-- Video Controls for Screen Recording -->
+  <div class="controls-bar">
+    <button class="ctrl-btn" id="btnPlay" style="background:#0284c7;">
+      <span>▶️ Demo Animatsiyasini boshlash</span>
+    </button>
+    <button class="ctrl-btn" id="btnReset">
+      <span>↺ Qayta boshlash</span>
+    </button>
+    <span class="time-tracker" id="timer">00:00 / 00:30</span>
+  </div>
+
+  <script>
+    const btnPlay = document.getElementById('btnPlay');
+    const btnReset = document.getElementById('btnReset');
+    const timer = document.getElementById('timer');
+    const caption = document.getElementById('caption');
+    const msg1 = document.getElementById('msg1');
+    const msg2 = document.getElementById('msg2');
+    const scamBubble = document.getElementById('scamBubble');
+    const himoyaCard = document.getElementById('himoyaCard');
+    const extBadge = document.getElementById('extBadge');
+    const extBadgeText = document.getElementById('extBadgeText');
+    const btnReveal = document.getElementById('btnReveal');
+
+    let isRunning = false;
+    let seconds = 0;
+    let timerInterval = null;
+
+    function resetDemo() {
+      isRunning = false;
+      clearInterval(timerInterval);
+      seconds = 0;
+      timer.textContent = "00:00 / 00:30";
+      caption.textContent = "▶️ Tayyor: 'Videoni boshlash' tugmasini bosing";
+      msg1.className = "msg-row";
+      msg2.className = "msg-row";
+      scamBubble.className = "msg-bubble";
+      himoyaCard.className = "himoya-alert-card";
+      extBadge.className = "ext-badge";
+      extBadgeText.textContent = "Himoya AI: Faol";
+    }
+
+    function run30sTimeline() {
+      if (isRunning) return;
+      resetDemo();
+      isRunning = true;
+
+      timerInterval = setInterval(() => {
+        seconds++;
+        const s = seconds < 10 ? '0' + seconds : seconds;
+        timer.textContent = `00:${s} / 00:30`;
+        if (seconds >= 30) {
+          clearInterval(timerInterval);
+          isRunning = false;
+          caption.textContent = "✅ 30 soniyalik video tayyor! Screen recordingni to'xtatishingiz mumkin.";
+        }
+      }, 1000);
+
+      // Timeline Steps:
+      // T = 1s: First friendly message arrives
+      setTimeout(() => {
+        caption.textContent = "💬 Telegram Web: Bot xabar yuborishni boshladi...";
+        msg1.classList.add('visible');
+      }, 1200);
+
+      // T = 5s: Attack scam message appears
+      setTimeout(() => {
+        caption.textContent = "🚨 Firibgar xabar keldi: Karta va SMS kod talab qilinmoqda!";
+        msg2.classList.add('visible');
+      }, 5000);
+
+      // T = 7.5s: Himoya DFA Engine intercepts in 0.02ms!
+      setTimeout(() => {
+        caption.textContent = "⚡ Himoya AI 0.02ms ichida xavfni aniqladi va xabarni xiralashtirdi!";
+        extBadge.className = "ext-badge alert";
+        extBadgeText.textContent = "Himoya: 1 ta xavf bartaraf etildi!";
+        scamBubble.classList.add('blurred');
+        himoyaCard.classList.add('show');
+      }, 7500);
+
+      // T = 14s: Highlight security details
+      setTimeout(() => {
+        caption.textContent = "🛡️ Closed Shadow DOM ogohlantirish kartasi: Foydalanuvchi ogohlantirildi!";
+      }, 14000);
+
+      // T = 19s: User safely reveals after reading warning
+      setTimeout(() => {
+        caption.textContent = "👁️ Foydalanuvchi ogohlantirishni o'qib, xavfsiz ko'rish tugmasini bosdi.";
+        scamBubble.classList.remove('blurred');
+      }, 19000);
+
+      // T = 24s: Call to action
+      setTimeout(() => {
+        caption.textContent = "🚀 Himoya Chrome Web Store'da bepul mavjud: 100% on-device maxfiylik!";
+      }, 24000);
+    }
+
+    btnPlay.addEventListener('click', run30sTimeline);
+    btnReset.addEventListener('click', resetDemo);
+    btnReveal.addEventListener('click', () => {
+      scamBubble.classList.remove('blurred');
+    });
+  </script>
+</body>
+</html>

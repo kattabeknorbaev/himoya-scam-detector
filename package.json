@@ -1,6 +1,6 @@
 {
   "name": "himoya-scam-detector",
-  "version": "5.4.0",
+  "version": "5.4.1",
   "description": "Enterprise-grade client-side cybersecurity engine protecting Central Asian users from card drainers, OTP phishing, and malicious APKs.",
   "type": "commonjs",
   "scripts": {

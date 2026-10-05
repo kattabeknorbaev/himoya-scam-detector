@@ -42,7 +42,7 @@
           <div class="brand-info">
             <div class="brand-title-row">
               <span class="brand-title">Himoya</span>
-              <span class="cyber-badge">AI v5.3</span>
+              <span class="cyber-badge">AI v5.4</span>
             </div>
             <span class="brand-subtitle">Real-time Scam Defense</span>
           </div>
@@ -90,6 +90,12 @@
             <path d="M6 10h10"/>
           </svg>
           <span class="nav-btn-text">Qoidalar</span>
+        </button>
+        <button type="button" class="nav-btn" data-tab="tab-report" id="navReport">
+          <svg class="nav-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          </svg>
+          <span class="nav-btn-text">Xabar</span>
         </button>
       </nav>
 
@@ -321,6 +327,69 @@
         </div>
       </div>
 
+      <!-- TAB 4: CROWDSOURCED INTELLIGENCE -->
+      <div class="tab-pane" id="tab-report">
+        <div class="cyber-card report-card">
+          <div class="report-header">
+            <div class="report-icon-box">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="report-title" id="reportCardTitle">Yangi firibgarlikni xabar qilish</h3>
+              <p class="report-subtitle" id="reportCardSub">Himoya hamjamiyati va O'zbekiston kiberxavfsizligiga o'z hissangizni qo'shing</p>
+            </div>
+          </div>
+
+          <div class="report-field-group">
+            <label class="field-label" id="reportTypeHeader">Firibgarlik turi:</label>
+            <select class="cyber-select" id="reportCategory">
+              <option value="CARD_DRAINER">Plastik karta / SMS kod o'g'irligi</option>
+              <option value="TELEGRAM_HIJACK">Telegram hisob o'g'irlash (Ovoz berish)</option>
+              <option value="APK_DROPPER">Zararli APK fayl (To'y taklifnomasi)</option>
+              <option value="FAKE_SUBSIDY">Soxta davlat kompensatsiyasi / Yordam</option>
+              <option value="PONZI">Moliyaviy piramida / Pul ko'paytirish</option>
+              <option value="OTHER">Boshqa turdagi firibgarlik</option>
+            </select>
+          </div>
+
+          <div class="report-field-group">
+            <label class="field-label" id="reportContentHeader">Shubhali matn, havola yoki bot manzili:</label>
+            <textarea class="cyber-textarea report-textarea" id="reportInput" rows="3" placeholder="Masalan: t.me/soxta_bot yoki 'Kartangiz bloklandi, SMS kodni yuboring...'"></textarea>
+          </div>
+
+          <div class="report-actions">
+            <button type="button" class="btn-cyber-primary" id="btnSubmitReport">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"/>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+              <span id="btnSubmitReportText">Xabarni qayd etish</span>
+            </button>
+            <a href="https://github.com/kattabeknorbaev/himoya-scam-detector/issues/new" target="_blank" class="btn-cyber-ghost report-github-btn" id="btnGithubIssue">
+              <span>GitHub orqali yuborish ↗</span>
+            </a>
+          </div>
+
+          <div class="report-status-banner" id="reportStatusBanner" style="display: none;">
+            <span id="reportStatusText">✅ Rahmat! Xabaringiz qayd etildi va tahlilga kiritildi.</span>
+          </div>
+
+          <div class="community-stats-box">
+            <div class="cstat-item">
+              <span class="cstat-num" id="reportedCount">0</span>
+              <span class="cstat-label" id="reportedCountLabel">Siz yuborgan xabarlar</span>
+            </div>
+            <div class="cstat-sep"></div>
+            <div class="cstat-item">
+              <span class="cstat-num">2,715+</span>
+              <span class="cstat-label">Himoyalangan belgilar</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- FOOTER -->
       <footer class="footer">
         <a href="https://github.com/kattabeknorbaev/himoya-scam-detector" target="_blank" class="footer-action" id="reportLink">
@@ -338,11 +407,12 @@
     </div>
   </div>
 
-  <script src="../i18n.js"></script>
-  <script src="../ml_classifier.js"></script>
-  <script src="../heuristics.js"></script>
-  <script src="../ai_provider.js"></script>
-  <script src="../engine.js"></script>
+  <script src="../utils/i18n.js"></script>
+  <script src="../utils/storage.js"></script>
+  <script src="../engine/normalizer.js"></script>
+  <script src="../engine/ahoCorasick.js"></script>
+  <script src="../engine/bloomFilter.js"></script>
+  <script src="../engine/analyzer.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>
