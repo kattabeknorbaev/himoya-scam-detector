@@ -2,11 +2,18 @@
 
 **Enterprise-Grade Client-Side Security Engine for Central Asia**
 
-[![Chrome Web Store Manifest V3](https://img.shields.io/badge/Manifest-V3-blue.svg)](https://developer.chrome.com/docs/extensions/mv3/intro/)
+[![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Published-4285F4?style=flat&logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/himoya-ai-scam-phishing-d/eollobpmfccpmoihbfpaemkghkeljbpj)
+[![Chrome Web Store Users](https://img.shields.io/chrome-web-store/users/eollobpmfccpmoihbfpaemkghkeljbpj?color=blue)](https://chromewebstore.google.com/detail/himoya-ai-scam-phishing-d/eollobpmfccpmoihbfpaemkghkeljbpj)
+[![Chrome Web Store Rating](https://img.shields.io/chrome-web-store/rating/eollobpmfccpmoihbfpaemkghkeljbpj)](https://chromewebstore.google.com/detail/himoya-ai-scam-phishing-d/eollobpmfccpmoihbfpaemkghkeljbpj)
 [![Version](https://img.shields.io/badge/Version-5.4.0-rose.svg)](https://github.com/kattabeknorbaev/himoya-scam-detector/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
 [![Privacy: 100% Offline](https://img.shields.io/badge/Privacy-100%25%20On--Device-success.svg)](store-assets/PRIVACY_POLICY.md)
 [![Throughput](https://img.shields.io/badge/Throughput-46k%20nodes%2Fsec-brightgreen.svg)](tests/benchmark.js)
+
+> ### 🚀 Install from Chrome Web Store
+> **Himoya is officially verified and published on the Google Chrome Web Store!**  
+> Install directly to Google Chrome, Brave, Arc, Edge, or Opera with one click:  
+> 👉 **[Add to Chrome — Himoya: AI Scam & Phishing Detector](https://chromewebstore.google.com/detail/himoya-ai-scam-phishing-d/eollobpmfccpmoihbfpaemkghkeljbpj)**
 
 Himoya (*"Protection"*) is an enterprise-grade, client-side browser extension (Manifest V3) purpose-built to shield Central Asian web users from digital financial fraud, card-draining funnels, OTP theft, fake subsidies, and malicious APK droppers across dynamic Single Page Applications (SPAs)—specifically **Telegram Web** (`web.telegram.org`), **Facebook** (`facebook.com`), and **Instagram** (`instagram.com`).
 
