@@ -23,7 +23,7 @@
             const rulesUrl = chrome.runtime.getURL('src/engine/rules.json');
             const res = await fetch(rulesUrl);
             const data = await res.json();
-            this.rules = data.patterns || [];
+            this.rules = (data && (data.rules || data.patterns)) ? (data.rules || data.patterns) : [];
             this.automaton.build(this.rules);
             this.isReady = true;
           }
@@ -161,13 +161,14 @@
       if (urlMatches.length > 0) {
         urlRisk = true;
         totalRiskWeight += 2.5;
-        if (typeof BloomFilter !== 'undefined') {
+        const bloom = typeof HimoyaBloomFilter !== 'undefined' ? HimoyaBloomFilter : (typeof BloomFilter !== 'undefined' ? BloomFilter : null);
+        if (bloom && typeof bloom.checkDomainReputation === 'function') {
           for (const u of urlMatches) {
             try {
-              const parsed = new URL(u.startsWith('http') ? u : `https://${u}`);
-              if (BloomFilter.testDomain(parsed.hostname)) {
+              const domainRep = bloom.checkDomainReputation(u);
+              if (domainRep && domainRep.isThreat) {
                 totalRiskWeight += 6.0;
-                categoriesDetected.set('PHISHING_DOMAIN', lang === 'ru' ? 'Опасный фишинг-домен' : (lang === 'uz_cyr' ? 'Хавфли фишинг домен' : 'Xavfli fishing domen'));
+                categoriesDetected.set(domainRep.threatType || 'PHISHING_DOMAIN', lang === 'ru' ? 'Опасный фишинг-домен' : (lang === 'uz_cyr' ? 'Хавфли фишинг домен' : 'Xavfli fishing domen'));
               }
             } catch (e) {}
           }

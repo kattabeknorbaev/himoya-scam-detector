@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="uz" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Himoya AI - Sandbox Threat Verification Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #080C14;
+      --bg-card: rgba(15, 23, 42, 0.85);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --primary-rose: #FF385C;
+      --primary-rose-glow: rgba(255, 56, 92, 0.35);
+      --accent-indigo: #6366F1;
+      --accent-emerald: #10B981;
+      --accent-amber: #F59E0B;
+      --text-main: #F8FAFC;
+      --text-sub: #94A3B8;
+      --radius-lg: 14px;
+      --radius-md: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(255, 56, 92, 0.07) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(99, 102, 241, 0.07) 0%, transparent 40%);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      min-height: 100vh;
+      padding: 30px 20px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* HEADER */
+    .header {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #FF385C 0%, #6366F1 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px var(--primary-rose-glow);
+    }
+
+    .brand-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      background: rgba(255, 56, 92, 0.15);
+      border: 1px solid rgba(255, 56, 92, 0.4);
+      color: #ff6b8b;
+      padding: 2px 7px;
+      border-radius: 6px;
+      margin-left: 8px;
+    }
+
+    .brand-subtitle {
+      font-size: 13px;
+      color: var(--text-sub);
+    }
+
+    .lang-switcher {
+      display: flex;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 3px;
+      gap: 3px;
+    }
+
+    .lang-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-sub);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .lang-btn.active {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+    }
+
+    /* CONTROL PANEL */
+    .controls-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .action-btn-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-scan {
+      background: linear-gradient(135deg, #FF385C 0%, #E11D48 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 16px rgba(255, 56, 92, 0.4);
+    }
+
+    .btn-scan:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(255, 56, 92, 0.6);
+    }
+
+    .btn-reset {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-sub);
+    }
+
+    .btn-reset:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      font-size: 12px;
+      font-weight: 600;
+      color: #34d399;
+    }
+
+    .status-pill.threats {
+      background: rgba(244, 63, 94, 0.15);
+      border-color: rgba(244, 63, 94, 0.4);
+      color: #fca5a5;
+    }
+
+    .dot-pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 8px currentColor;
+    }
+
+    /* CUSTOM MESSAGE INJECTOR */
+    .custom-injector-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .injector-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .injector-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .custom-input {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .custom-input:focus {
+      border-color: var(--primary-rose);
+      box-shadow: 0 0 12px rgba(255, 56, 92, 0.25);
+    }
+
+    .btn-inject {
+      background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 10px 18px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .btn-inject:hover {
+      filter: brightness(1.1);
+    }
+
+    /* CHAT STREAM SIMULATOR */
+    .stream-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding: 0 4px;
+    }
+
+    .stream-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stream-counter {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+
+    .chat-stream {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* TELEGRAM MESSAGE BUBBLE */
+    .msg-card {
+      background: #182533;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .msg-meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .sender-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #2b5278;
+      color: #64b5f6;
+      font-size: 12px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .avatar.safe {
+      background: #065f46;
+      color: #34d399;
+    }
+
+    .sender-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #64b5f6;
+    }
+
+    .sender-name.safe {
+      color: #34d399;
+    }
+
+    .msg-time {
+      font-size: 11px;
+      color: #708499;
+    }
+
+    .test-vector-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .test-vector-tag.scam {
+      background: rgba(244, 63, 94, 0.15);
+      border-color: rgba(244, 63, 94, 0.35);
+      color: #fca5a5;
+    }
+
+    .test-vector-tag.safe {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.35);
+      color: #6ee7b7;
+    }
+
+    /* Target message content selectors (matching contentScript.js) */
+    .message-content, .bubble-content, .text-content {
+      font-size: 13.5px;
+      color: #e4ecf2;
+      line-height: 1.55;
+      word-break: break-word;
+      transition: filter 0.3s ease, opacity 0.3s ease;
+    }
+
+    .message-content strong {
+      color: #ffffff;
+    }
+
+    .message-content a {
+      color: #64b5f6;
+      text-decoration: underline;
+    }
+
+    /* Standalone Threat Banner Overlay (Simulated Shadow DOM) */
+    .threat-banner-overlay {
+      background: linear-gradient(135deg, #101626 0%, #080C14 100%);
+      border: 1px solid rgba(255, 56, 92, 0.4);
+      border-left: 4px solid #FF385C;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      animation: bannerSlideDown 0.25s ease;
+    }
+
+    @keyframes bannerSlideDown {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .threat-banner-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .threat-title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .threat-level-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: #FF385C;
+      color: #ffffff;
+      box-shadow: 0 0 10px rgba(255, 56, 92, 0.5);
+    }
+
+    .threat-desc {
+      font-size: 12px;
+      color: #fca5a5;
+      margin-bottom: 8px;
+    }
+
+    .threat-advice-box {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 11.5px;
+      color: #cbd5e1;
+      margin-bottom: 10px;
+      line-height: 1.45;
+    }
+
+    .threat-actions-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .threat-tokens {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .threat-token-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      background: rgba(255, 56, 92, 0.15);
+      border: 1px solid rgba(255, 56, 92, 0.3);
+      color: #fca5a5;
+      padding: 1px 6px;
+      border-radius: 3px;
+    }
+
+    .btn-reveal {
+      background: linear-gradient(135deg, #FF385C 0%, #E11D48 100%);
+      color: #ffffff;
+      border: none;
+      padding: 5px 14px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(255, 56, 92, 0.35);
+    }
+
+    .btn-reveal:hover {
+      filter: brightness(1.1);
+    }
+
+    /* FOOTER */
+    .page-footer {
+      text-align: center;
+      margin-top: 36px;
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-top">
+        <div class="brand-group">
+          <div class="brand-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="m9 12 2 2 4-4"/>
+            </svg>
+          </div>
+          <div>
+            <div style="display: flex; align-items: center;">
+              <h1 class="brand-title">Himoya AI Sandbox</h1>
+              <span class="brand-badge">Verification Suite</span>
+            </div>
+            <p class="brand-subtitle" id="subTitleText">Markaziy Osiyo moliyaviy kiber-hujumlarini simulyatsiya qilish va testlash platformasi</p>
+          </div>
+        </div>
+
+        <div class="lang-switcher">
+          <button type="button" class="lang-btn active" data-lang="uz">UZ</button>
+          <button type="button" class="lang-btn" data-lang="uz_cyr">ЎЗ</button>
+          <button type="button" class="lang-btn" data-lang="ru">RU</button>
+        </div>
+      </div>
+
+      <div class="controls-bar">
+        <div class="action-btn-group">
+          <button type="button" class="btn-action btn-scan" id="btnRunTestScan">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <span id="scanBtnText">Himoya Bilan Tekshirish (Live Scan)</span>
+          </button>
+          <button type="button" class="btn-action btn-reset" id="btnResetAll">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+              <path d="M3 3v5h5"/>
+            </svg>
+            <span id="resetBtnText">Qayta Tiklash</span>
+          </button>
+        </div>
+
+        <div class="status-pill" id="liveStatusBadge">
+          <span class="dot-pulse"></span>
+          <span id="liveStatusText">Himoya sinovga tayyor</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- CUSTOM MESSAGE INJECTOR -->
+    <div class="custom-injector-card">
+      <div class="injector-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #6366F1;">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+        <span id="injectorHeading">O'zingizning xabaringizni kiritib ko'ring:</span>
+      </div>
+      <div class="injector-row">
+        <input type="text" class="custom-input" id="customMsgInput" placeholder="Masalan: 'Sizga 500 ming yordam puli chiqdi, karta raqam va sms kodni yozing'...">
+        <button type="button" class="btn-inject" id="btnAddMsg">Qo'shish va Tekshirish</button>
+      </div>
+    </div>
+
+    <!-- CHAT STREAM SIMULATOR -->
+    <div class="stream-header">
+      <span class="stream-title" id="streamHeading">Telegram / Ijtimoiy Tarmoq Xabarlari Oqimi</span>
+      <span class="stream-counter" id="streamCounter">6 ta xabar</span>
+    </div>
+
+    <div class="chat-stream" id="chatStream">
+      <!-- VECTOR 1: CARD DRAINER + OTP SMS THEFT -->
+      <div class="msg-card" data-vector="CARD_DRAINER">
+        <div class="msg-meta-row">
+          <div class="sender-group">
+            <div class="avatar">TG</div>
+            <div>
+              <div class="sender-name">Rasmiy Sovg'alar va Aksiya</div>
+              <div class="msg-time">bugun 14:10</div>
+            </div>
+          </div>
+          <span class="test-vector-tag scam">1. Karta + SMS O'g'irligi</span>
+        </div>
+        <div class="message-content bubble-content text-content">
+          TABRIKLAYMIZ! Siz <strong>5,000,000 SO'M</strong> yutib oldingiz! Pulni plastik kartangizga yechib olish uchun 16 xonali karta raqami (8600...), amal qilish muddati va telefoningizga kelgan 5 xonali SMS tasdiqlash kodini yuboring! Shoshiling, vaqt chegaralangan!
+        </div>
+      </div>
+
+      <!-- VECTOR 2: MALICIOUS APK DROPPER -->
+      <div class="msg-card" data-vector="APK_DROPPER">
+        <div class="msg-meta-row">
+          <div class="sender-group">
+            <div class="avatar">TG</div>
+            <div>
+              <div class="sender-name">Noma'lum Raqam (+998 90 *** ** 12)</div>
+              <div class="msg-time">bugun 13:45</div>
+            </div>
+          </div>
+          <span class="test-vector-tag scam">2. Zararli APK Troyan</span>
+        </div>
+        <div class="message-content bubble-content text-content">
+          Salom do'stim! Bu rasmda senmisan? Shuncha odam ko'ribdi sharmanda! Tezroq <strong>to'y_taklifnomasi.apk</strong> faylini yuklab olib ochib ko'r, qara nimalar bo'lyapti!
+        </div>
+      </div>
+
+      <!-- VECTOR 3: TELEGRAM HIJACK VIA CONTEST VOTING -->
+      <div class="msg-card" data-vector="TELEGRAM_HIJACK">
+        <div class="msg-meta-row">
+          <div class="sender-group">
+            <div class="avatar">TG</div>
+            <div>
+              <div class="sender-name">Dilnoza (Sinfdosh)</div>
+              <div class="msg-time">bugun 12:30</div>
+            </div>
+          </div>
+          <span class="test-vector-tag scam">3. Telegram O'g'irlash (Ovoz)</span>
+        </div>
+        <div class="message-content bubble-content text-content">
+          Iltimos yordam berib yuboring! Jiyanim maktablararo 'Yil bolasi' tanlovida qatnashyapti. Mana bu havola orqali kirib ovoz bering: <a href="#">https://t.me-ovoz-berish.xyz/vote</a> Telegramingizga kod keladi, shuni tasdiqlasangiz bo'ldi!
+        </div>
+      </div>
+
+      <!-- VECTOR 4: FAKE SUBSIDY / PRESIDENTIAL DECREE -->
+      <div class="msg-card" data-vector="FAKE_SUBSIDY">
+        <div class="msg-meta-row">
+          <div class="sender-group">
+            <div class="avatar">TG</div>
+            <div>
+              <div class="sender-name">Kompensatsiya Yangiliklari Bot</div>
+              <div class="msg-time">bugun 11:15</div>
+            </div>
+          </div>
+          <span class="test-vector-tag scam">4. Soxta Kompensatsiya</span>
+        </div>
+        <div class="message-content bubble-content text-content">
+          Prezidentning yangi 425-sonli qaroriga muvofiq, barcha voyaga yetmagan bolalar va kam ta'minlangan oilalarga <strong>1,200,000 so'm</strong> bir martalik kompensatsiya to'lanadi. Ro'yxatdan o'tish uchun quyidagi botga kiring va ma'lumotlaringizni to'ldiring: @davlat_yordam_bot
+        </div>
+      </div>
+
+      <!-- VECTOR 5: FINANCIAL PYRAMID (PONZI) -->
+      <div class="msg-card" data-vector="PONZI">
+        <div class="msg-meta-row">
+          <div class="sender-group">
+            <div class="avatar">TG</div>
+            <div>
+              <div class="sender-name">Crypto Uz Invest Guruh</div>
+              <div class="msg-time">bugun 10:05</div>
+            </div>
+          </div>
+          <span class="test-vector-tag scam">5. Moliyaviy Piramida</span>
+        </div>
+        <div class="message-content bubble-content text-content">
+          Kunlik kafolatlangan daromad! Bizning treyding algoritmimiz orqali <strong>100,000 so'm</strong> tikib, 2 soat ichida <strong>300,000 so'm</strong> qilib qaytarib oling! Hech qanday xatarsiz, 100% pulni ko'paytirish kafolatlangan!
+        </div>
+      </div>
+
+      <!-- VECTOR 6: BENIGN / SAFE CHAT -->
+      <div class="msg-card" data-vector="SAFE">
+        <div class="msg-meta-row">
+          <div class="sender-group">
+            <div class="avatar safe">AL</div>
+            <div>
+              <div class="sender-name safe">Alisher (Kursdosh)</div>
+              <div class="msg-time">bugun 09:20</div>
+            </div>
+          </div>
+          <span class="test-vector-tag safe">6. Xavfsiz Xabar (Nazorat)</span>
+        </div>
+        <div class="message-content bubble-content text-content">
+          Salom Kattabek! Ertaga soat 10:00 da universitet kutubxonasida kompyuter injiniringi loyihasi bo'yicha uchrashamiz, noutbukingni olib kelishni unutma. Taqdimot slaydlarini tayyorlab qo'ydim.
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="page-footer">
+      <p>Himoya AI Enterprise Threat Verification Suite • 100% Client-side Real-time Evaluation</p>
+    </footer>
+  </div>
+
+  <!-- LOAD UNIFIED HIMOYA ENGINE MODULES -->
+  <script src="src/utils/i18n.js"></script>
+  <script src="src/engine/normalizer.js"></script>
+  <script src="src/engine/ahoCorasick.js"></script>
+  <script src="src/engine/bloomFilter.js"></script>
+  <script src="src/engine/analyzer.js"></script>
+
+  <script>
+    (function () {
+      'use strict';
+
+      let currentLang = 'uz';
+      let threatCount = 0;
+
+      const btnRunTestScan = document.getElementById('btnRunTestScan');
+      const btnResetAll = document.getElementById('btnResetAll');
+      const liveStatusBadge = document.getElementById('liveStatusBadge');
+      const liveStatusText = document.getElementById('liveStatusText');
+      const customMsgInput = document.getElementById('customMsgInput');
+      const btnAddMsg = document.getElementById('btnAddMsg');
+      const chatStream = document.getElementById('chatStream');
+      const streamCounter = document.getElementById('streamCounter');
+      const langBtns = document.querySelectorAll('.lang-btn');
+
+      // Update counters
+      function updateCounters() {
+        const total = chatStream.querySelectorAll('.msg-card').length;
+        streamCounter.textContent = `${total} ta xabar`;
+      }
+
+      // Language Switcher
+      langBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          langBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentLang = btn.dataset.lang;
+        });
+      });
+
+      // Scan and evaluate all messages
+      function runScan() {
+        const cards = chatStream.querySelectorAll('.msg-card');
+        threatCount = 0;
+
+        cards.forEach(card => {
+          // Clear any previous overlay
+          const oldOverlay = card.querySelector('.threat-banner-overlay');
+          if (oldOverlay) oldOverlay.remove();
+
+          const contentEl = card.querySelector('.message-content');
+          if (!contentEl) return;
+
+          const text = contentEl.innerText || contentEl.textContent || '';
+          
+          let res = null;
+          if (typeof analyzeContent === 'function') {
+            res = analyzeContent(text, 4.0, currentLang);
+          } else if (typeof HimoyaAnalyzer !== 'undefined' && typeof HimoyaAnalyzer.analyze === 'function') {
+            res = HimoyaAnalyzer.analyze(text, currentLang);
+          }
+
+          if (res && res.isScam) {
+            threatCount++;
+            // Apply blur
+            contentEl.style.filter = 'blur(8px)';
+            contentEl.style.opacity = '0.35';
+            contentEl.style.pointerEvents = 'none';
+
+            // Create institutional warning banner
+            const overlay = document.createElement('div');
+            overlay.className = 'threat-banner-overlay';
+
+            const catLabel = (res.categories && res.categories.length > 0)
+              ? res.categories.map(c => c.name || c.id).join(', ')
+              : 'Xavfli Firibgarlik';
+
+            const tokenPills = (res.matchedKeywords || []).slice(0, 4)
+              .map(t => `<span class="threat-token-pill">${t}</span>`).join('');
+
+            overlay.innerHTML = `
+              <div class="threat-banner-head">
+                <div class="threat-title-group">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF385C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <path d="M12 8v4M12 16h.01"/>
+                  </svg>
+                  <span>Himoya: Xavfli xabar bloklandi</span>
+                </div>
+                <span class="threat-level-badge">${res.riskLevel || 'YUQORI'}</span>
+              </div>
+              <div class="threat-desc"><strong>Tahdid turi:</strong> ${catLabel} (${res.mlProbability || 90}% ehtimol)</div>
+              <div class="threat-advice-box">
+                🛡️ <strong>Tavsiya:</strong> ${res.advice || 'Ushbu havolaga kirmang va ma\'lumotlaringizni yubormang!'}
+              </div>
+              <div class="threat-actions-row">
+                <div class="threat-tokens">${tokenPills}</div>
+                <button type="button" class="btn-reveal">👁️ Ko'rish (Reveal)</button>
+              </div>
+            `;
+
+            // Reveal button logic
+            overlay.querySelector('.btn-reveal').addEventListener('click', () => {
+              contentEl.style.filter = 'none';
+              contentEl.style.opacity = '1';
+              contentEl.style.pointerEvents = 'auto';
+              overlay.remove();
+            });
+
+            card.insertBefore(overlay, contentEl);
+          } else {
+            contentEl.style.filter = 'none';
+            contentEl.style.opacity = '1';
+            contentEl.style.pointerEvents = 'auto';
+          }
+        });
+
+        // Update status badge
+        if (threatCount > 0) {
+          liveStatusBadge.className = 'status-pill threats';
+          liveStatusText.textContent = `🚨 ${threatCount} ta xavfli xabar aniqlandi va to'xtatildi!`;
+        } else {
+          liveStatusBadge.className = 'status-pill';
+          liveStatusText.textContent = `🛡️ Barcha xabarlar xavfsiz`;
+        }
+      }
+
+      // Reset all cards
+      function resetAll() {
+        const cards = chatStream.querySelectorAll('.msg-card');
+        cards.forEach(card => {
+          const oldOverlay = card.querySelector('.threat-banner-overlay');
+          if (oldOverlay) oldOverlay.remove();
+          const contentEl = card.querySelector('.message-content');
+          if (contentEl) {
+            contentEl.style.filter = 'none';
+            contentEl.style.opacity = '1';
+            contentEl.style.pointerEvents = 'auto';
+          }
+        });
+        threatCount = 0;
+        liveStatusBadge.className = 'status-pill';
+        liveStatusText.textContent = 'Himoya sinovga tayyor';
+      }
+
+      // Add Custom Message
+      function addCustomMessage() {
+        const val = (customMsgInput.value || '').trim();
+        if (!val) {
+          customMsgInput.focus();
+          return;
+        }
+
+        const newCard = document.createElement('div');
+        newCard.className = 'msg-card';
+        newCard.dataset.vector = 'CUSTOM';
+        newCard.innerHTML = `
+          <div class="msg-meta-row">
+            <div class="sender-group">
+              <div class="avatar">USER</div>
+              <div>
+                <div class="sender-name">Siz kiritgan xabar</div>
+                <div class="msg-time">hozir</div>
+              </div>
+            </div>
+            <span class="test-vector-tag">Foydalanuvchi sinovi</span>
+          </div>
+          <div class="message-content bubble-content text-content">${val}</div>
+        `;
+
+        chatStream.prepend(newCard);
+        customMsgInput.value = '';
+        updateCounters();
+
+        // Run scan immediately on the new card
+        runScan();
+      }
+
+      btnRunTestScan.addEventListener('click', runScan);
+      btnResetAll.addEventListener('click', resetAll);
+      btnAddMsg.addEventListener('click', addCustomMessage);
+      customMsgInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') addCustomMessage();
+      });
+
+      updateCounters();
+    })();
+  </script>
+</body>
+</html>

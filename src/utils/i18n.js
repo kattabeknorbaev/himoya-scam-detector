@@ -45,7 +45,10 @@ const HIMOYA_I18N = {
     reportModalTitle: "Yangi firibgarlik haqida xabar bering",
     reportTypeLabel: "Firibgarlik turi:",
     reportContentLabel: "Shubhali matn, havola yoki bot:",
-    reportSubmitBtn: "Xabarni yuborish (Hamjamiyatga hissa)",
+    reportSubmitBtn: "Nusxalash va saqlash",
+    reportTelegramBtn: "Telegram orqali yuborish",
+    reportSaveBtn: "Nusxalash va saqlash",
+    historyTitle: "Oxirgi qayd etilgan xabarlar:",
     reportSuccess: "Rahmat! Xabaringiz qayd etildi va tahlilga kiritildi.",
     rules: [
       {
@@ -112,7 +115,10 @@ const HIMOYA_I18N = {
     reportModalTitle: "Янги фирибгарлик ҳақида хабар беринг",
     reportTypeLabel: "Фирибгарлик тури:",
     reportContentLabel: "Шубҳали матн, ҳавола ёки бот:",
-    reportSubmitBtn: "Хабарни юбориш (Ҳамжамиятга ҳисса)",
+    reportSubmitBtn: "Нусхалаш ва сақлаш",
+    reportTelegramBtn: "Telegram орқали юбориш",
+    reportSaveBtn: "Нусхалаш ва сақлаш",
+    historyTitle: "Охирги қайд этилган хабарлар:",
     reportSuccess: "Раҳмат! Хабарингиз қайд этилди ва таҳлилга киритилди.",
     rules: [
       {
@@ -179,7 +185,10 @@ const HIMOYA_I18N = {
     reportModalTitle: "Сообщить о новом мошенничестве",
     reportTypeLabel: "Тип мошенничества:",
     reportContentLabel: "Подозрительный текст, ссылка или бот:",
-    reportSubmitBtn: "Отправить сообщение (Вклад в сообщество)",
+    reportSubmitBtn: "Скопировать и сохранить",
+    reportTelegramBtn: "Отправить через Telegram",
+    reportSaveBtn: "Скопировать и сохранить",
+    historyTitle: "История отправленных сообщений:",
     reportSuccess: "Спасибо! Сообщение сохранено и передано на анализ.",
     rules: [
       {
