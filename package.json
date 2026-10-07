@@ -4,7 +4,7 @@
   "description": "Enterprise-grade client-side cybersecurity engine protecting Central Asian users from card drainers, OTP phishing, and malicious APKs.",
   "type": "commonjs",
   "scripts": {
-    "test": "node tests/ahoCorasick.test.js && node tests/normalizer.test.js",
+    "test": "node tests/ahoCorasick.test.js && node tests/normalizer.test.js && node tests/run_generalized_test.js",
     "benchmark": "node tests/benchmark.js"
   },
   "keywords": [
