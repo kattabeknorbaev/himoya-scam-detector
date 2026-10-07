@@ -517,7 +517,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   function runAnalysis() {
     if (!checkerInput || !resultBox || !checkerResult) return;
     const text = (checkerInput.value || '').trim();
-    if (!text) return;
+    if (!text) {
+      checkerInput.style.borderColor = '#f43f5e';
+      checkerInput.style.boxShadow = '0 0 12px rgba(244, 63, 94, 0.4)';
+      checkerInput.focus();
+      setTimeout(() => {
+        checkerInput.style.borderColor = '';
+        checkerInput.style.boxShadow = '';
+      }, 1500);
+      return;
+    }
 
     const str = (typeof HIMOYA_I18N !== 'undefined' && HIMOYA_I18N[currentLang]) ? HIMOYA_I18N[currentLang] : {};
 
@@ -539,6 +548,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     checkerResult.style.display = 'block';
+    checkerResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
     if (res.isScam) {
       resultBox.className = 'result-card scam';
@@ -665,7 +675,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       const list = Array.isArray(data.himoya_user_reports) ? data.himoya_user_reports : [];
       if (reportedCount) reportedCount.textContent = list.length.toString();
     });
-  }
   }
 
   // Event: Simulator Demo Button
