@@ -51,6 +51,7 @@
         <div class="header-controls">
           <!-- Language Segmented Pills -->
           <div class="lang-pills" id="langPills">
+            <button type="button" class="lang-pill" data-lang="en">EN</button>
             <button type="button" class="lang-pill active" data-lang="uz">UZ</button>
             <button type="button" class="lang-pill" data-lang="uz_cyr">ЎЗ</button>
             <button type="button" class="lang-pill" data-lang="ru">RU</button>
@@ -117,6 +118,23 @@
             </div>
           </div>
           <div class="threat-counter-badge" id="threatCountBadge" title="Sahifada bloklangan tahdidlar">0</div>
+        </div>
+
+        <!-- Hero Instant Actions -->
+        <div class="hero-actions-row">
+          <button type="button" class="btn-hero-action" id="heroQuickScanBtn" title="Klipborddagi xabarni tekshirish">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="8" height="4" x="8" y="2" rx="1" ry="1"/>
+              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+            </svg>
+            <span id="heroQuickScanText">Klipborddan tekshirish</span>
+          </button>
+          <button type="button" class="btn-hero-action btn-hero-sim" id="heroSimulateBtn" title="Xavf simulyatsiyasi">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            <span id="heroSimulateText">Sinov hujumi</span>
+          </button>
         </div>
 
         <!-- Active Domain Shield Row -->
@@ -271,13 +289,28 @@
             <span class="shortcut-pill" id="shortcutHint">Ctrl+Enter ↵</span>
           </div>
 
-          <!-- Scan Action Button -->
-          <button type="button" class="btn-cyber-primary" id="checkMsgBtn">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-            </svg>
-            <span id="checkBtnText">Xabarni tekshirish</span>
-          </button>
+          <!-- Inline validation alert -->
+          <div class="empty-input-alert" id="emptyAlert" style="display: none;">
+            <span>⚠️</span>
+            <span id="emptyAlertText">Iltimos, avval matn yoki havola kiriting!</span>
+          </div>
+
+          <!-- Scan Action Buttons (Dual Trigger) -->
+          <div class="scanner-btn-group">
+            <button type="button" class="btn-cyber-primary" id="checkMsgBtn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+              </svg>
+              <span id="checkBtnText">Xabarni tekshirish</span>
+            </button>
+            <button type="button" class="btn-cyber-secondary" id="btnPasteScan" title="Klipborddan nusxalab tekshirish">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="8" height="4" x="8" y="2" rx="1" ry="1"/>
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+              </svg>
+              <span id="pasteBtnText">Klipborddan</span>
+            </button>
+          </div>
 
           <!-- Result Container -->
           <div class="result-wrapper" id="checkerResult" style="display: none;">

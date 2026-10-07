@@ -1,9 +1,88 @@
 /**
- * Himoya i18n Localization Dictionary v5.4.1
- * Fully supports: O'zbekcha (Lotin), Ўзбекча (Кирилл), and Русский
+ * Himoya i18n Localization Dictionary v5.5.0
+ * Comprehensive multi-lingual support:
+ * - English (EN)
+ * - O'zbekcha / Latin (UZ)
+ * - Ўзбекча / Cyrillic (UZ_CYR)
+ * - Русский (RU)
  */
 
 const HIMOYA_I18N = {
+  en: {
+    extensionTitle: "Himoya",
+    tagline: "Client-Side Cyber Defense",
+    statusActive: "Protection Active & Shielding",
+    statusDisabled: "Protection Paused",
+    threatsOnPage: "suspicious items on this page",
+    threatsNone: "No threats detected on page",
+    threatsDetected: "{count} threats neutralized",
+    statsToday: "Blocked Today",
+    statsTotal: "Total Blocked",
+    whitelistBtnTrust: "Trust Site",
+    whitelistBtnTrusted: "Trusted",
+    sensitivityLabel: "Detection Sensitivity:",
+    sensitivityStrict: "Strict",
+    sensitivityBalanced: "Standard",
+    sensitivityRelaxed: "Relaxed",
+    audioAlertLabel: "Audio Warning",
+    checkerTab: "Scanner",
+    rulesTab: "Guidelines",
+    reportTab: "Report",
+    checkerPlaceholder: "Paste suspicious Telegram message, SMS, or link here...",
+    checkerBtn: "Analyze Message",
+    pasteBtn: "Paste & Scan",
+    quickScan: "Quick Clipboard Scan",
+    testSimulation: "Simulate Attack",
+    emptyInputAlert: "Please enter or paste a message or link first!",
+    analyzingText: "AI Analyzing...",
+    shortcutHint: "Ctrl+Enter ↵",
+    clearText: "Clear",
+    copied: "Copied!",
+    copyDiag: "Copy Diagnostics",
+    checkerSafe: "🛡️ NO SUSPICIOUS PATTERNS DETECTED",
+    checkerSafeDesc: "No card drainer, OTP theft, or social engineering indicators found.",
+    checkerScam: "🚨 ALERT: SCAM DETECTED",
+    cardTitle: "Himoya: Suspicious Post Detected",
+    cardDesc: "Indicators of financial fraud or credential exfiltration detected (Score: {score}).",
+    cardReveal: "👁️ Reveal",
+    cardDismiss: "✓ False Positive (Safe)",
+    ribbonTitle: "Himoya: Warning Dismissed",
+    ribbonReblur: "Re-hide Content",
+    riskHigh: "🚨 High Risk",
+    riskMedium: "⚠️ Suspicious",
+    reportLink: "⚠️ Report New Scam Pattern",
+    reportModalTitle: "Contribute Threat Intelligence",
+    reportTypeLabel: "Scam Vector:",
+    reportContentLabel: "Suspicious text, link, or bot username:",
+    reportSubmitBtn: "Copy & Record Locally",
+    reportTelegramBtn: "Dispatch to Telegram",
+    reportSaveBtn: "Save Report",
+    historyTitle: "Recent Reported Threats:",
+    reportSuccess: "Thank you! Threat logged and queued for rule indexing.",
+    rules: [
+      {
+        title: "1. Never Share SMS Verification Codes",
+        desc: "Bank operators and security personnel never ask for your 5 or 6-digit SMS verification code or CVV."
+      },
+      {
+        title: "2. No Legitimate System Doubles Money Overnight",
+        desc: "Promised guaranteed returns (e.g., turning 100k into 500k in hours) are 100% Ponzi schemes."
+      },
+      {
+        title: "3. Never Pay Advance Fees to Claim a Prize",
+        desc: "Legitimate lotteries or subsidies do not require insurance, registration fee, or transfer deposits."
+      },
+      {
+        title: "4. Never Install Unknown .APK Files",
+        desc: "Files masked as wedding invitations, court orders, or photo albums are banking trojans."
+      },
+      {
+        title: "5. Beware of Contest Voting Links",
+        desc: "'Vote for my relative' lures steal your Telegram session to solicit emergency loans from contacts."
+      }
+    ]
+  },
+
   uz: {
     extensionTitle: "Himoya",
     tagline: "O'zbek xalqi xavfsizligi uchun",
@@ -26,11 +105,16 @@ const HIMOYA_I18N = {
     reportTab: "Xabar qilish",
     checkerPlaceholder: "Telegram yoki SMSdan kelgan shubhali xabarni shu yerga qo'ying...",
     checkerBtn: "Xabarni tekshirish",
+    pasteBtn: "Klipborddan tekshirish",
+    quickScan: "Klipborddan tekshirish",
+    testSimulation: "Sinov hujumi",
+    emptyInputAlert: "Iltimos, avval tekshirish uchun matn yoki havola kiriting!",
+    analyzingText: "AI tahlil qilmoqda...",
     shortcutHint: "Ctrl+Enter ↵",
     clearText: "Tozalash",
     copied: "Nusxalandi!",
     copyDiag: "Natijani nusxalash",
-    checkerSafe: "✅ Shubhali belgilar aniqlanmadi (Xavfsiz ko'rinadi).",
+    checkerSafe: "🛡️ SHUBHALI BELGILAR TOPILMADI (XAVFSIZ)",
     checkerSafeDesc: "Xabarda moliyaviy firibgarlik yoki fishing alomatlari aniqlanmadi.",
     checkerScam: "🚨 XAVF: FIRIBGARLIK ANIQLANDI",
     cardTitle: "Himoya: Shubhali post aniqlandi",
@@ -96,11 +180,16 @@ const HIMOYA_I18N = {
     reportTab: "Хабар қилиш",
     checkerPlaceholder: "Телеграм ёки СМСдан келган шубҳали хабарни шу ерга қўйинг...",
     checkerBtn: "Хабарни текшириш",
+    pasteBtn: "Клипборддан текшириш",
+    quickScan: "Клипборддан текшириш",
+    testSimulation: "Синов ҳужуми",
+    emptyInputAlert: "Илтимос, аввал текшириш учун матн ёки ҳавола киритинг!",
+    analyzingText: "ИИ таҳлил қилмоқда...",
     shortcutHint: "Ctrl+Enter ↵",
     clearText: "Тозалаш",
     copied: "Нусхаланди!",
     copyDiag: "Натижани нусхалаш",
-    checkerSafe: "✅ Шубҳали белгилар аниқланмади (Хавфсиз кўринади).",
+    checkerSafe: "🛡️ ШУБҲАЛИ БЕЛГИЛАР ТОПИЛМАДИ (ХАВФСИЗ)",
     checkerSafeDesc: "Хабарда молиявий фирибгарлик ёки фишинг аломатлари аниқланмади.",
     checkerScam: "🚨 ХАВФ: ФИРИБГАРЛИК АНИҚЛАНДИ",
     cardTitle: "Ҳимоя: Шубҳали пост аниқланди",
@@ -116,7 +205,7 @@ const HIMOYA_I18N = {
     reportTypeLabel: "Фирибгарлик тури:",
     reportContentLabel: "Шубҳали матн, ҳавола ёки бот:",
     reportSubmitBtn: "Нусхалаш ва сақлаш",
-    reportTelegramBtn: "Telegram орқали юбориш",
+    reportTelegramBtn: "Телеграм орқали юбориш",
     reportSaveBtn: "Нусхалаш ва сақлаш",
     historyTitle: "Охирги қайд этилган хабарлар:",
     reportSuccess: "Раҳмат! Хабарингиз қайд этилди ва таҳлилга киритилди.",
@@ -138,7 +227,7 @@ const HIMOYA_I18N = {
         desc: "Тўй таклифномаси ёки суд қарори ниқобидаги файллар банк картангиздаги пулларни ўғирлайди."
       },
       {
-        title: "5. 'Овоз беринг' ҳаволаларига Telegram кодини киритманг",
+        title: "5. 'Овоз беринг' ҳаволаларига Телеграм кодини киритманг",
         desc: "Телеграмингиз ўғирланади ва танишларингиздан номингиздан қарз сўрашади."
       }
     ]
@@ -146,32 +235,37 @@ const HIMOYA_I18N = {
 
   ru: {
     extensionTitle: "Himoya",
-    tagline: "Защита от онлайн-мошенничества",
-    statusActive: "Himoya активно защищает",
+    tagline: "Киберзащита для пользователей Центральной Азии",
+    statusActive: "Защита активна и работает",
     statusDisabled: "Защита приостановлена",
-    threatsOnPage: "угроз найдено на этой странице",
+    threatsOnPage: "подозрительных угроз на странице",
     threatsNone: "Угроз на странице не обнаружено",
     threatsDetected: "Обезврежено угроз: {count}",
-    statsToday: "Заблокировано сегодня",
-    statsTotal: "Всего заблокировано",
+    statsToday: "Остановлено сегодня",
+    statsTotal: "Всего остановлено",
     whitelistBtnTrust: "Доверенный",
-    whitelistBtnTrusted: "Отключен",
-    sensitivityLabel: "Чувствительность:",
+    whitelistBtnTrusted: "Отключено",
+    sensitivityLabel: "Чувствительность анализа:",
     sensitivityStrict: "Высокая",
     sensitivityBalanced: "Стандарт",
-    sensitivityRelaxed: "Легкая",
+    sensitivityRelaxed: "Мягкая",
     audioAlertLabel: "Звуковое оповещение",
-    checkerTab: "Проверка",
+    checkerTab: "Сканер",
     rulesTab: "Правила",
     reportTab: "Сообщить",
-    checkerPlaceholder: "Вставьте подозрительное сообщение из Telegram или SMS...",
+    checkerPlaceholder: "Вставьте подозрительное сообщение из Telegram, SMS или ссылку...",
     checkerBtn: "Проверить текст",
+    pasteBtn: "Вставить из буфера",
+    quickScan: "Проверить из буфера",
+    testSimulation: "Тест-атака",
+    emptyInputAlert: "Пожалуйста, введите текст сообщения или ссылку!",
+    analyzingText: "ИИ анализирует...",
     shortcutHint: "Ctrl+Enter ↵",
     clearText: "Очистить",
     copied: "Скопировано!",
     copyDiag: "Скопировать отчет",
-    checkerSafe: "✅ Подозрительных признаков не обнаружено.",
-    checkerSafeDesc: "В тексте не найдено признаков финансового мошенничества или фишинга.",
+    checkerSafe: "🛡️ ПОДОЗРИТЕЛЬНЫХ ПРИЗНАКОВ НЕ ОБНАРУЖЕНО",
+    checkerSafeDesc: "В тексте не найдено признаков финансового мошенничества, кражи карт или фишинга.",
     checkerScam: "🚨 ОПАСНОСТЬ: ОБНАРУЖЕНО МОШЕННИЧЕСТВО",
     cardTitle: "Himoya: Обнаружен подозрительный пост",
     cardDesc: "В тексте найдены признаки фишинга или мошенничества (Оценка: {score}).",

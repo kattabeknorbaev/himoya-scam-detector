@@ -46,6 +46,12 @@
     const navRules = document.getElementById('navRules');
     const navReport = document.getElementById('navReport');
 
+    // Tab 1 Hero Actions
+    const heroQuickScanBtn = document.getElementById('heroQuickScanBtn');
+    const heroQuickScanText = document.getElementById('heroQuickScanText');
+    const heroSimulateBtn = document.getElementById('heroSimulateBtn');
+    const heroSimulateText = document.getElementById('heroSimulateText');
+
     // Scanner Tab
     const checkerTitle = document.getElementById('checkerTitle');
     const checkerHint = document.getElementById('checkerHint');
@@ -55,6 +61,10 @@
     const shortcutHint = document.getElementById('shortcutHint');
     const checkMsgBtn = document.getElementById('checkMsgBtn');
     const checkBtnText = document.getElementById('checkBtnText');
+    const btnPasteScan = document.getElementById('btnPasteScan');
+    const pasteBtnText = document.getElementById('pasteBtnText');
+    const emptyAlert = document.getElementById('emptyAlert');
+    const emptyAlertText = document.getElementById('emptyAlertText');
     const checkerResult = document.getElementById('checkerResult');
     const resultBox = document.getElementById('resultBox');
     const copyDiagBtn = document.getElementById('copyDiagBtn');
@@ -209,11 +219,17 @@
       if (reportSpan && str.reportLink) reportSpan.textContent = str.reportLink.replace('⚠️ ', '');
       if (footerCopy && str.tagline) footerCopy.textContent = str.tagline;
 
+      // Tab 1 Hero Actions
+      if (heroQuickScanText && str.quickScan) heroQuickScanText.textContent = str.quickScan;
+      if (heroSimulateText && str.testSimulation) heroSimulateText.textContent = str.testSimulation;
+
       // Scanner Tab
-      if (checkerTitle) checkerTitle.textContent = str.checkerTab ? 'Matnni tekshirish' : 'Matnni tekshirish';
+      if (checkerTitle) checkerTitle.textContent = str.checkerTab || 'Matnni tekshirish';
       if (checkerHint && str.checkerPlaceholder) checkerHint.textContent = str.checkerPlaceholder.replace('...', '');
       if (checkerInput && str.checkerPlaceholder) checkerInput.placeholder = str.checkerPlaceholder;
       if (checkBtnText) checkBtnText.textContent = str.checkerBtn ? str.checkerBtn.replace('🔍 ', '') : 'Xabarni tekshirish';
+      if (pasteBtnText && str.pasteBtn) pasteBtnText.textContent = str.pasteBtn;
+      if (emptyAlertText && str.emptyInputAlert) emptyAlertText.textContent = str.emptyInputAlert;
       if (shortcutHint && str.shortcutHint) shortcutHint.textContent = str.shortcutHint;
       if (clearInputBtn && str.clearText) clearInputBtn.title = str.clearText;
       if (copyText && str.copyDiag) copyText.textContent = str.copyDiag;
@@ -276,10 +292,17 @@
     function runAnalysis() {
       if (!checkerInput || !resultBox || !checkerResult) return;
       const text = (checkerInput.value || '').trim();
+      const str = (typeof HIMOYA_I18N !== 'undefined' && HIMOYA_I18N[currentLang]) ? HIMOYA_I18N[currentLang] : {};
 
       if (!text) {
         checkerInput.style.borderColor = '#f43f5e';
         checkerInput.style.boxShadow = '0 0 14px rgba(244, 63, 94, 0.45)';
+        if (emptyAlert) {
+          emptyAlert.style.display = 'flex';
+          setTimeout(() => {
+            emptyAlert.style.display = 'none';
+          }, 3000);
+        }
         checkerInput.focus();
         setTimeout(() => {
           checkerInput.style.borderColor = '';
@@ -288,17 +311,15 @@
         return;
       }
 
-      // Visual button feedback
-      if (checkMsgBtn) {
-        checkMsgBtn.style.opacity = '0.85';
-        checkMsgBtn.style.transform = 'scale(0.98)';
-        setTimeout(() => {
-          checkMsgBtn.style.opacity = '1';
-          checkMsgBtn.style.transform = '';
-        }, 180);
-      }
+      if (emptyAlert) emptyAlert.style.display = 'none';
 
-      const str = (typeof HIMOYA_I18N !== 'undefined' && HIMOYA_I18N[currentLang]) ? HIMOYA_I18N[currentLang] : {};
+      // Visual button loading feedback
+      const originalCheckText = checkBtnText ? checkBtnText.textContent : 'Xabarni tekshirish';
+      if (checkBtnText) checkBtnText.textContent = str.analyzingText || 'AI tahlil qilmoqda...';
+      if (checkMsgBtn) {
+        checkMsgBtn.style.opacity = '0.75';
+        checkMsgBtn.style.transform = 'scale(0.98)';
+      }
 
       let res = null;
       try {
@@ -310,6 +331,15 @@
       } catch (err) {
         console.warn('[Himoya Checker] Analyzer error:', err);
       }
+
+      // Restore button text
+      setTimeout(() => {
+        if (checkBtnText) checkBtnText.textContent = originalCheckText;
+        if (checkMsgBtn) {
+          checkMsgBtn.style.opacity = '1';
+          checkMsgBtn.style.transform = '';
+        }
+      }, 150);
 
       if (!res) {
         res = {
@@ -325,7 +355,9 @@
       }
 
       checkerResult.style.display = 'block';
-      checkerResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      setTimeout(() => {
+        checkerResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 60);
 
       if (res.isScam) {
         resultBox.className = 'result-card scam';
@@ -484,6 +516,90 @@
       checkMsgBtn.addEventListener('click', (e) => {
         e.preventDefault();
         runAnalysis();
+      });
+    }
+
+    // 6b. Paste from Clipboard & Scan Button
+    if (btnPasteScan && checkerInput) {
+      btnPasteScan.addEventListener('click', async (e) => {
+        e.preventDefault();
+        try {
+          const clipboardText = await navigator.clipboard.readText();
+          if (clipboardText && clipboardText.trim()) {
+            checkerInput.value = clipboardText.trim();
+            updateCharCounter();
+            runAnalysis();
+          } else {
+            if (emptyAlert && emptyAlertText) {
+              const str = (typeof HIMOYA_I18N !== 'undefined' && HIMOYA_I18N[currentLang]) ? HIMOYA_I18N[currentLang] : {};
+              emptyAlertText.textContent = currentLang === 'en' ? 'Clipboard is empty!' : (currentLang === 'ru' ? 'Буфер обмена пуст!' : 'Vaqtinchalik xotira bo\'sh!');
+              emptyAlert.style.display = 'flex';
+              setTimeout(() => { emptyAlert.style.display = 'none'; }, 2500);
+            }
+            checkerInput.focus();
+          }
+        } catch (err) {
+          checkerInput.focus();
+        }
+      });
+    }
+
+    // 6c. Tab 1 Hero Quick Clipboard Scan
+    if (heroQuickScanBtn) {
+      heroQuickScanBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        // Switch to Tab 2
+        navBtns.forEach(b => b.classList.remove('active'));
+        tabPanes.forEach(c => c.classList.remove('active'));
+        if (navChecker) {
+          navChecker.classList.add('active');
+          updateNavSlider(navChecker);
+        }
+        const target = document.getElementById('tab-checker');
+        if (target) target.classList.add('active');
+
+        try {
+          const clipboardText = await navigator.clipboard.readText();
+          if (clipboardText && clipboardText.trim() && checkerInput) {
+            checkerInput.value = clipboardText.trim();
+            updateCharCounter();
+            runAnalysis();
+          } else if (checkerInput) {
+            checkerInput.focus();
+          }
+        } catch (err) {
+          if (checkerInput) checkerInput.focus();
+        }
+      });
+    }
+
+    // 6d. Tab 1 Hero Attack Simulator
+    if (heroSimulateBtn) {
+      heroSimulateBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        setThreatDisplay(currentPageThreats + 1);
+        if (threatSub) {
+          threatSub.textContent = currentLang === 'en' 
+            ? '🚨 Attack Intercepted: Card Drainer Blocked' 
+            : (currentLang === 'ru' ? '🚨 Атака отражена: кража карты блокирована' : '🚨 Hujum to\'xtatildi: Karta drainer bloklandi');
+        }
+        if (statusDot) statusDot.className = 'radar-center-core alert';
+
+        // Brief audio beep if enabled
+        if (audioToggle && audioToggle.checked) {
+          try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(880, ctx.currentTime);
+            gain.gain.setValueAtTime(0.08, ctx.currentTime);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.15);
+          } catch (err) {}
+        }
       });
     }
 
@@ -750,7 +866,7 @@
 
     if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
       chrome.storage.local.get(
-        ['himoya_enabled', 'himoya_sensitivity', 'himoya_whitelist', 'himoya_stats_today', 'himoya_stats_total', 'himoya_lang', 'himoya_audio', 'himoya_user_reports'],
+        ['himoya_enabled', 'himoya_sensitivity', 'himoya_whitelist', 'himoya_stats_today', 'himoya_stats_total', 'himoya_lang', 'himoya_audio', 'himoya_user_reports', 'himoya_pending_scan'],
         (data) => {
           if (!data) return;
           const enabled = data.himoya_enabled !== undefined ? data.himoya_enabled : true;
@@ -779,6 +895,26 @@
           if (matchedRadio) matchedRadio.checked = true;
 
           updateWhitelistButtonState(whitelist.includes(currentDomain));
+
+          // Check for pending right-click scan
+          if (data.himoya_pending_scan) {
+            const pendingText = data.himoya_pending_scan;
+            chrome.storage.local.remove('himoya_pending_scan');
+            if (pendingText && checkerInput) {
+              navBtns.forEach(b => b.classList.remove('active'));
+              tabPanes.forEach(c => c.classList.remove('active'));
+              if (navChecker) {
+                navChecker.classList.add('active');
+                updateNavSlider(navChecker);
+              }
+              const target = document.getElementById('tab-checker');
+              if (target) target.classList.add('active');
+
+              checkerInput.value = pendingText;
+              updateCharCounter();
+              setTimeout(() => runAnalysis(), 80);
+            }
+          }
         }
       );
     }

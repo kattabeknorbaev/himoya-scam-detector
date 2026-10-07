@@ -38,9 +38,9 @@
   padding: 0;
 }
 
-body {
-  width: 385px;
-  min-height: 520px;
+html, body {
+  width: 395px;
+  max-height: 595px;
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background-color: var(--bg-deep);
   color: var(--text-main);
@@ -49,6 +49,21 @@ body {
   -moz-osx-font-smoothing: grayscale;
   user-select: none;
   overflow-x: hidden;
+  overflow-y: auto;
+}
+
+body::-webkit-scrollbar {
+  width: 5px;
+}
+body::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+}
+body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 4px;
+}
+body::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-rose);
 }
 
 /* Ambient Glow Orbs */
@@ -56,7 +71,6 @@ body {
   position: relative;
   background-color: var(--bg-deep);
   min-height: 100%;
-  overflow: hidden;
 }
 
 .ambient-glow {
@@ -517,6 +531,49 @@ body {
   50% { transform: scale(1.1); }
 }
 
+/* Hero Quick Action Bar */
+.hero-actions-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: -2px;
+}
+
+.btn-hero-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: var(--radius-md);
+  padding: 8px 10px;
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-hero-action:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.22);
+  transform: translateY(-1px);
+}
+
+.btn-hero-sim {
+  color: #fca5a5;
+  border-color: rgba(244, 63, 94, 0.25);
+  background: rgba(244, 63, 94, 0.06);
+}
+
+.btn-hero-sim:hover {
+  background: rgba(244, 63, 94, 0.16);
+  border-color: rgba(244, 63, 94, 0.5);
+  box-shadow: 0 0 14px rgba(244, 63, 94, 0.25);
+}
+
 /* Domain Shield Row */
 .domain-shield-card {
   display: flex;
@@ -770,14 +827,28 @@ body {
   color: var(--text-muted);
 }
 
-/* Sample chips */
+/* Sample chips horizontal stream */
 .sample-chips-row {
   display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
+  flex-wrap: nowrap;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 3px;
+  scrollbar-width: thin;
+}
+
+.sample-chips-row::-webkit-scrollbar {
+  height: 3px;
+}
+
+.sample-chips-row::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
 }
 
 .sample-chip {
+  flex-shrink: 0;
+  white-space: nowrap;
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -887,8 +958,30 @@ body {
   border-radius: 4px;
 }
 
+/* Empty Input Alert */
+.empty-input-alert {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(244, 63, 94, 0.12);
+  border: 1px solid rgba(244, 63, 94, 0.4);
+  color: #fca5a5;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: var(--radius-md);
+  animation: fadeIn 0.15s ease;
+}
+
+/* Scanner Button Group */
+.scanner-btn-group {
+  display: flex;
+  gap: 8px;
+}
+
 /* Primary Cyber Action Button */
 .btn-cyber-primary {
+  flex: 1.3;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -896,9 +989,9 @@ body {
   background: var(--primary-gradient);
   color: #ffffff;
   border: none;
-  padding: 10px 16px;
+  padding: 10px 14px;
   font-family: inherit;
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 700;
   border-radius: var(--radius-lg);
   cursor: pointer;
@@ -912,6 +1005,37 @@ body {
 }
 
 .btn-cyber-primary:active {
+  transform: translateY(0);
+}
+
+/* Secondary Cyber Action Button (Paste & Scan) */
+.btn-cyber-secondary {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(99, 102, 241, 0.12);
+  color: #c7d2fe;
+  border: 1.5px solid rgba(99, 102, 241, 0.35);
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 700;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.2s var(--spring-ease);
+}
+
+.btn-cyber-secondary:hover {
+  background: rgba(99, 102, 241, 0.22);
+  border-color: rgba(99, 102, 241, 0.65);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
+}
+
+.btn-cyber-secondary:active {
   transform: translateY(0);
 }
 
